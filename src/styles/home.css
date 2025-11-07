@@ -1,0 +1,100 @@
+.Home-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    min-height: calc(var(--vh) * 100);
+    width: 100%;
+    padding-top: 60px;
+    background-color: #FFFAF4;
+    overflow: hidden;
+    position: relative;
+    padding-bottom: 150px;
+}
+
+.login-btn {
+    position:absolute;
+    top: 30px;
+    right: 35px;
+    background-color: #FFFAF4;
+    border: none;
+    padding: 8px;
+    font-size: 17px;
+    font-weight: bolder;
+    cursor: pointer;
+    z-index: 10;
+    transition: 0.2s;
+}
+
+.logo {
+  width: clamp(140px, 45vw, 450px);
+  height: auto;
+  margin-bottom: 30px;
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 45px;
+}
+
+.menu-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.icon-wrapper {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: -30px;
+    z-index: 2;
+    overflow: visible;
+}
+
+.masak-bg { background-color: #FF3535; }
+.makan-bg { background-color: #FF5F00; }
+
+.masakSendiri { background-color: #FF3535; }
+.makandiLuar { background-color: #FF5F00; }
+
+.icon-image {
+    width: 95px;
+    height: auto;
+}
+
+.masakSendiri, .makandiLuar {
+    width: 300px;
+    height: 120px;
+    padding: 45px 0 20px;
+    border-radius: 20px;
+    border: none;
+    font-weight: 600;
+    font-size: 18px;
+    color: white;
+    cursor: pointer;
+    transition: 0.25s;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+@media (max-width: 480px){
+    .home-logo{
+        width:140px;
+    }
+    .icon-wrapper {
+        width: 55px;
+        height: 55px;
+    }
+    .icon-image {
+        width: 75px;
+    }
+    .masakSendiri, .makandiLuar {
+        width: 200px;
+        font-size: 16px;
+    }
+}

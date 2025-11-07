@@ -1,0 +1,22 @@
+.navbar {
+  position: fixed;
+  bottom: 10px;
+  left: 0;
+  width: 100%;
+
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+  background-color:#FFFAF4;
+  padding: 12px 0;
+  border: None;
+
+  z-index: 50;
+}
+
+.navbar img {
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+}
