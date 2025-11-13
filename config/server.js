@@ -3,6 +3,9 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import supabase from './db.js'
 import authRoutes from '../routes/authRoutes.js'
+import tempatMakanRoutes from "../routes/cariTempatRoutes.js"
+import cariResepRoutes from '../routes/cariResepRoutes.js'
+import detailResepRoutes from '../routes/resepDetailRoutes.js'
 
 dotenv.config()
 
@@ -19,9 +22,15 @@ app.get('/', async (req, res) => {
 
 // 🛠️ taruh semua route di atas sebelum listen()
 app.use('/api/auth', authRoutes)
+app.use("/api/tempatmakan", tempatMakanRoutes)
+app.use('/api/resep', cariResepRoutes)
+app.use("/api/resepDetail", detailResepRoutes)
 
 // 🚀 jalankan server di bawah
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`)
 })
+
+// const PORT = process.env.PORT || 3000;
+// app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
