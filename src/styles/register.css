@@ -29,7 +29,8 @@
     border: 2px solid #FF853A;
 }
 
-.register-button, .register-button a {
+.register-button{
+    display: flex;
     width: clamp(140px, 60vw, 450px);
     padding: 20px;
     border-radius: 10px;
@@ -43,9 +44,10 @@
     margin-top: 20px;
     margin-bottom: 20px;
     text-decoration: None;
+    justify-content: center;
 }
 
-.login, .login a, .password a {
+.login, .login a{
     font-size: 12px;
     margin-top: 20px;
     color: #000000;

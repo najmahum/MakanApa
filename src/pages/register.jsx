@@ -11,7 +11,7 @@ const Register = () => {
             <input type="text" placeholder="Username" className="register-input" />
             <input type="text" placeholder="Email" className="register-input" />
             <input type="password" placeholder="Password" className="register-input" />
-            <button className="register-button"><Link to="/login">Sign Up</Link></button>
+            <Link to="/login" className="register-button">Sign Up</Link>
             <p className="login">
                 Sudah punya akun? <Link to="/login">Login</Link>
             </p>

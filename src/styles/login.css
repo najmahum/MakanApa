@@ -29,7 +29,8 @@
     border: 2px solid #FF853A;
 }
 
-.login-button {
+.login-button{
+    display:flex;
     width: clamp(150px, 60vw, 450px);
     padding: 20px;
     border-radius: 10px;
@@ -42,6 +43,8 @@
     transition:0.2s;
     margin-top: 20px;
     margin-bottom: 20px;
+    text-decoration: None;
+    justify-content: center;
 }
 
 .register, .register a, .password {

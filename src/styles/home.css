@@ -1,29 +1,30 @@
 .Home-container {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
     min-height: calc(var(--vh) * 100);
     width: 100%;
-    padding-top: 60px;
+    padding: 50px 0 120px;
     background-color: #FFFAF4;
     overflow: hidden;
     position: relative;
-    padding-bottom: 150px;
 }
 
 .login-btn {
-    position:absolute;
+    position: absolute;
     top: 30px;
     right: 35px;
-    background-color: #FFFAF4;
+    background-color: transparent;
     border: none;
     padding: 8px;
     font-size: 17px;
     font-weight: bolder;
     cursor: pointer;
-    z-index: 10;
+    z-index: 2;
     transition: 0.2s;
+    text-decoration: none;
+    color: #000;
 }
 
 .logo {
@@ -46,44 +47,45 @@
 }
 
 .icon-wrapper {
-    width: 88px;
-    height: 88px;
+    width: 85px;
+    height: 100px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: -30px;
+    margin-bottom: -35px;
     z-index: 2;
     overflow: visible;
 }
 
-.masak-bg { background-color: #FF3535; }
-.makan-bg { background-color: #FF5F00; }
-
-.masakSendiri { background-color: #FF3535; }
-.makandiLuar { background-color: #FF5F00; }
+.masak-bg, .masakSendiri { background-color: #FF3535; }
+.makan-bg, .makandiLuar { background-color: #FF5F00; }
 
 .icon-image {
-    width: 95px;
+    width: 100px;
     height: auto;
+    margin-top: -20px;
 }
 
 .masakSendiri, .makandiLuar {
     width: 300px;
-    height: 120px;
-    padding: 45px 0 20px;
+    height: 70px;
+    padding-top: 40px;
     border-radius: 20px;
     border: none;
     font-weight: 600;
     font-size: 18px;
     color: white;
     cursor: pointer;
+    text-align: center;
     transition: 0.25s;
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    text-decoration: none;
+    font-weight: bold;
 }
 
 @media (max-width: 480px){
-    .home-logo{
+    .logo{
         width:140px;
     }
     .icon-wrapper {
@@ -96,5 +98,6 @@
     .masakSendiri, .makandiLuar {
         width: 200px;
         font-size: 16px;
+        padding-top: 35px;
     }
 }

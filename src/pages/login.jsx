@@ -13,7 +13,7 @@ const Login = () => {
             <p className="password">
                 Lupa password?
             </p>
-            <button className="login-button">Login</button>
+            <Link to="/home" className="login-button">Login</Link>
             <p className="register">
                 Belum punya akun? <Link to="/register">Daftar sekarang</Link>
             </p>
