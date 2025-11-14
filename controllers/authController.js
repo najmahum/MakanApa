@@ -1,5 +1,6 @@
 import supabase from '../config/db.js'
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 
 // REGISTER USER
 export const registerUser = async (req, res) => {
@@ -10,44 +11,52 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ error: 'Email, username, dan password wajib diisi' })
     }
 
-    // Hash password agar aman
+    // Cek username duplikat (karena UNIQUE)
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('username')
+      .eq('username', username)
+      .single()
+
+    if (existingUser) {
+      return res.status(400).json({ error: 'Username sudah terdaftar' })
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    // 1️⃣ Buat user di Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email,
-      password,
-    })
+    // Insert data baru (tanpa id_user karena SERIAL)
+    const { data, error } = await supabase
+      .from('users')
+      .insert([{
+        email,
+        username,
+        password: hashedPassword,
+        role,
+        status
+      }])
+      .select()
 
-    if (authError) throw authError
+    if (error) throw error
 
-    // 2️⃣ Simpan user ke tabel USER
-    const { error: insertError } = await supabase
-      .from('USER')
-      .insert([
-        {
-          id_user: authData.user.id,
-          email,
-          username,
-          password: hashedPassword,
-          role,
-          status,
-          tanggal_dibuat: new Date().toISOString(),
-        },
-      ])
-
-    if (insertError) throw insertError
+    const user = data[0]
 
     res.status(201).json({
-      message: '✅ Registrasi berhasil!',
-      user: { id: authData.user.id, email, username, role },
+      message: "Registrasi berhasil!",
+      user: {
+        id_user: user.id_user,
+        email: user.email,
+        username: user.username
+      }
     })
+
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
 }
 
-// LOGIN USER
+
+
+// LOGIN
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body
@@ -56,40 +65,42 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ error: 'Email dan password wajib diisi' })
     }
 
-    // 1️⃣ Login via Supabase Auth
-    const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-
-    if (loginError) throw loginError
-
-    // 2️⃣ Ambil data user dari tabel USER
-    const { data: userData, error: userError } = await supabase
-      .from('USER')
+    const { data: user, error } = await supabase
+      .from('users')
       .select('*')
       .eq('email', email)
       .single()
 
-    if (userError) throw userError
+    if (error || !user) {
+      return res.status(401).json({ error: 'Email tidak ditemukan' })
+    }
+
+    const match = await bcrypt.compare(password, user.password)
+    if (!match) {
+      return res.status(401).json({ error: 'Password salah' })
+    }
+
+    // BUAT JWT
+    const token = jwt.sign(
+      { id_user: user.id_user, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    )
 
     res.status(200).json({
-      message: '✅ Login berhasil!',
-      token: loginData.session.access_token,
-      user: userData,
+      message: "Login berhasil!",
+      token,
+      user
     })
-  } catch (err) {
-    res.status(401).json({ error: err.message })
-  }
-}
 
-// LOGOUT USER
-export const logoutUser = async (req, res) => {
-  try {
-    const { error } = await supabase.auth.signOut()
-    if (error) throw error
-    res.status(200).json({ message: '👋 Logout berhasil!' })
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
+}
+
+
+
+// LOGOUT
+export const logoutUser = async (req, res) => {
+  return res.status(200).json({ message: "Logout berhasil (hapus token di client)" })
 }

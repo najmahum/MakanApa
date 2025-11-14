@@ -6,12 +6,20 @@ import authRoutes from '../routes/authRoutes.js'
 import tempatMakanRoutes from "../routes/cariTempatRoutes.js"
 import cariResepRoutes from '../routes/cariResepRoutes.js'
 import detailResepRoutes from '../routes/resepDetailRoutes.js'
-
+import tambahResepRoutes from '../routes/tambahResepRoutes.js'
+import activityLogRoutes from "../routes/activityLogRoutes.js";
 dotenv.config()
 
 const app = express()
 app.use(cors())
 app.use(express.json())
+
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ error: "JSON tidak valid! Periksa format body request." })
+  }
+  next()
+})
 
 // 🧭 route utama buat cek koneksi ke Supabase
 app.get('/', async (req, res) => {
@@ -25,6 +33,8 @@ app.use('/api/auth', authRoutes)
 app.use("/api/tempatmakan", tempatMakanRoutes)
 app.use('/api/resep', cariResepRoutes)
 app.use("/api/resepDetail", detailResepRoutes)
+app.use('/api/resep', tambahResepRoutes)
+app.use("/api/logs", activityLogRoutes);
 
 // 🚀 jalankan server di bawah
 const PORT = process.env.PORT || 3000
