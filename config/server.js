@@ -8,7 +8,11 @@ import cariResepRoutes from '../routes/cariResepRoutes.js'
 import detailResepRoutes from '../routes/resepDetailRoutes.js'
 import tambahResepRoutes from '../routes/tambahResepRoutes.js'
 import activityLogRoutes from "../routes/activityLogRoutes.js"
-import favoritRoutes from '../routes/favoritRoutes.js';
+import favoritRoutes from '../routes/favoritRoutes.js'
+import adminDashboardRoutes from './routes/adminDashboardRoutes.js'
+import adminUserRoutes from './routes/adminUserRoutes.js'
+import adminResepRoutes from './routes/adminResepRoutes.js'
+import profile from './routes/profieRoutes.js';
 dotenv.config()
 
 const app = express()
@@ -36,7 +40,11 @@ app.use('/api/resep', cariResepRoutes)
 app.use("/api/resepDetail", detailResepRoutes)
 app.use('/api/resep', tambahResepRoutes)
 app.use("/api/logs", activityLogRoutes)
-app.use('/api/favorit', favoritRoutes);
+app.use('/api/favorit', favoritRoutes)
+app.use('/api/admin/dashboard', adminDashboardRoutes) 
+app.use('/api/admin/users', adminUserRoutes)          
+app.use('/api/admin/recipes', adminResepRoutes)
+app.use('/api/profile', profile);
 
 // 🚀 jalankan server di bawah
 const PORT = process.env.PORT || 3000
