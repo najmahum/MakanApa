@@ -7,7 +7,8 @@ import tempatMakanRoutes from "../routes/cariTempatRoutes.js"
 import cariResepRoutes from '../routes/cariResepRoutes.js'
 import detailResepRoutes from '../routes/resepDetailRoutes.js'
 import tambahResepRoutes from '../routes/tambahResepRoutes.js'
-import activityLogRoutes from "../routes/activityLogRoutes.js";
+import activityLogRoutes from "../routes/activityLogRoutes.js"
+import favoritRoutes from '../routes/favoritRoutes.js';
 dotenv.config()
 
 const app = express()
@@ -34,7 +35,8 @@ app.use("/api/tempatmakan", tempatMakanRoutes)
 app.use('/api/resep', cariResepRoutes)
 app.use("/api/resepDetail", detailResepRoutes)
 app.use('/api/resep', tambahResepRoutes)
-app.use("/api/logs", activityLogRoutes);
+app.use("/api/logs", activityLogRoutes)
+app.use('/api/favorit', favoritRoutes);
 
 // 🚀 jalankan server di bawah
 const PORT = process.env.PORT || 3000
