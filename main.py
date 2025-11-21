@@ -6,18 +6,14 @@ from rapidfuzz import process, fuzz
 from functools import lru_cache
 from fastapi import FastAPI
 from pydantic import BaseModel
+import sys
 
 # ==========================================
-# 1. DEFINISI CLASS (WAJIB ADA UNTUK PICKLE)
+# 1. DEFINISI CLASS
 # ==========================================
-# Kita harus menaruh kode class ini persis seperti di Colab
-# agar pickle mengenali struktur datanya.
-
 class ResepRekomendasiModel:
     
     def __init__(self, dataframe_master, dataframe_bahan):
-        # Init ini sebenarnya tidak akan dijalankan saat load pickle,
-        # tapi strukturnya harus tetap ada.
         self.df_master = dataframe_master.set_index('id_resep')
         self.df_bahan = dataframe_bahan
         
@@ -78,7 +74,6 @@ class ResepRekomendasiModel:
         return hasil if skor >= 70 else kata
 
     def rekomendasi(self, input_user, threshold=0.3):
-        # Regex diperbaiki sesuai update terakhir
         bahan_input = re.split(r'[\s,]+', input_user.strip().lower())
         bahan_input = [b for b in bahan_input if b]
         bahan_normal = [self._normalisasi_bahan(b) for b in bahan_input]
@@ -119,21 +114,26 @@ class ResepRekomendasiModel:
         }
 
 # ==========================================
-# 2. KONFIGURASI FASTAPI
+# 2. KONFIGURASI API
 # ==========================================
-
 app = FastAPI(
     title="API Rekomendasi Resep",
     description="API sederhana untuk rekomendasi resep berdasarkan bahan makanan."
 )
 
 # ==========================================
-# 3. LOAD MODEL
+# 3. LOAD MODEL (DENGAN TRIK PICKLE)
 # ==========================================
 MODEL_FILE = "rekomendasi_model.pkl"
 model = None
 
 try:
+    # --- TRIK PENTING: MENGATASI ERROR NAMESPACE ---
+    # Kita memaksa 'ResepRekomendasiModel' agar dikenali sebagai bagian dari __main__
+    import __main__
+    setattr(__main__, "ResepRekomendasiModel", ResepRekomendasiModel)
+    # -----------------------------------------------
+
     with open(MODEL_FILE, "rb") as f:
         model = pickle.load(f)
     print(f"✅ Berhasil memuat model dari {MODEL_FILE}")
@@ -142,33 +142,24 @@ except FileNotFoundError:
 except Exception as e:
     print(f"❌ ERROR: Gagal memuat model. Detail: {e}")
 
+
 # ==========================================
 # 4. ENDPOINTS
 # ==========================================
-
 @app.get("/")
 def home():
-    return {
-        "status": "online",
-        "pesan": "Server Rekomendasi Resep berjalan! Gunakan endpoint /rekomendasi untuk memulai."
-    }
+    return {"status": "online", "pesan": "Server Siap!"}
 
 @app.get("/rekomendasi/")
 def get_rekomendasi(bahan: str):
     if model is None:
         return {"error": "Model belum dimuat. Cek log server."}
     
-    if not bahan or bahan.strip() == "":
-        return {"error": "Mohon masukkan bahan makanan. Contoh: ?bahan=nasi,telur"}
+    if not bahan:
+        return {"error": "Mohon masukkan bahan makanan."}
 
     try:
         hasil = model.rekomendasi(bahan)
-        return {
-            "status": "sukses",
-            "data": hasil
-        }
+        return {"status": "sukses", "data": hasil}
     except Exception as e:
-        return {"error": f"Terjadi kesalahan saat memproses data: {str(e)}"}
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+        return {"error": f"Error: {str(e)}"}
