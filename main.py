@@ -2,14 +2,14 @@ import pickle
 import uvicorn
 import pandas as pd
 import re
+import io
 from rapidfuzz import process, fuzz
 from functools import lru_cache
 from fastapi import FastAPI
 from pydantic import BaseModel
-import sys
 
 # ==========================================
-# 1. DEFINISI CLASS
+# 1. DEFINISI CLASS (HARUS ADA)
 # ==========================================
 class ResepRekomendasiModel:
     
@@ -24,7 +24,7 @@ class ResepRekomendasiModel:
             "bawang": "bawang", "bwg": "bawang", "bawng": "bawang", "bwng": "bawang", "bamer": "bawang merah",
             "bawang merah": "bawang merah", "bwg merah": "bawang merah", "baput": "bawang putih",
             "bawang putih": "bawang putih", "bwg putih": "bawang putih", "bawang bombay": "bawang bombay",
-            "bawang bombai": "bawang bombay", "bombay": "bawang bombay", "daun bawang": "daun bawang",
+            "bawang bombai": "bawang bombai", "bombay": "bawang bombay", "daun bawang": "daun bawang",
             "bawang prei": "daun bawang", "daun prei": "daun bawang", "loncang": "daun bawang",
             "jaheh": "jahe", "jhe": "jahe", "jahe": "jahe", "lengkoas": "lengkuas", "lengkuas": "lengkuas",
             "laos": "lengkuas", "kunyit": "kunyit", "kunir": "kunyit", "kencur": "kencur", "sereh": "serai",
@@ -114,7 +114,19 @@ class ResepRekomendasiModel:
         }
 
 # ==========================================
-# 2. KONFIGURASI API
+# 2. CUSTOM UNPICKLER (SOLUSI PAMUNGKAS)
+# ==========================================
+# Ini adalah "Jembatan" yang memaksa pickle menggunakan class di atas
+class CustomUnpickler(pickle.Unpickler):
+    def find_class(self, module, name):
+        # Jika pickle mencari "ResepRekomendasiModel" di modul mana saja,
+        # paksa dia menggunakan class yang kita definisikan di file ini.
+        if name == 'ResepRekomendasiModel':
+            return ResepRekomendasiModel
+        return super().find_class(module, name)
+
+# ==========================================
+# 3. KONFIGURASI API
 # ==========================================
 app = FastAPI(
     title="API Rekomendasi Resep",
@@ -122,20 +134,16 @@ app = FastAPI(
 )
 
 # ==========================================
-# 3. LOAD MODEL (DENGAN TRIK PICKLE)
+# 4. LOAD MODEL MENGGUNAKAN CUSTOM UNPICKLER
 # ==========================================
 MODEL_FILE = "rekomendasi_model.pkl"
 model = None
 
 try:
-    # --- TRIK PENTING: MENGATASI ERROR NAMESPACE ---
-    # Kita memaksa 'ResepRekomendasiModel' agar dikenali sebagai bagian dari __main__
-    import __main__
-    setattr(__main__, "ResepRekomendasiModel", ResepRekomendasiModel)
-    # -----------------------------------------------
-
     with open(MODEL_FILE, "rb") as f:
-        model = pickle.load(f)
+        # GUNAKAN CustomUnpickler DI SINI
+        model = CustomUnpickler(f).load()
+        
     print(f"✅ Berhasil memuat model dari {MODEL_FILE}")
 except FileNotFoundError:
     print(f"❌ ERROR: File {MODEL_FILE} tidak ditemukan!")
@@ -144,7 +152,7 @@ except Exception as e:
 
 
 # ==========================================
-# 4. ENDPOINTS
+# 5. ENDPOINTS
 # ==========================================
 @app.get("/")
 def home():
