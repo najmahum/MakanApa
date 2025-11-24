@@ -8,7 +8,7 @@ export const cariResep = async (req, res) => {
     }
 
     // URL API ML kamu di Render
-    const ML_API_URL = "https://makanapa.onrender.com";
+    const ML_API_URL = "https://makanapa.onrender.com/docs";
 
     // Kirim data bahan ke FastAPI di Render
     const response = await fetch(ML_API_URL, {
