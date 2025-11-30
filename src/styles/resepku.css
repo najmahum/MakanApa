@@ -1,0 +1,213 @@
+/* Container Utama */
+.resep-ku-container {
+  background-color: #FFFBF5;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'League Spartan', sans-serif;
+  padding-bottom: 100px;
+  position: relative;
+}
+
+.header-title-center {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 25px;
+  margin-bottom: 10px;
+}
+
+.header-padding {
+    padding: 20px 20px 0 20px;
+}
+
+/* Area Tengah (Flex Center) */
+.content-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0 30px;
+  text-align: center;
+}
+
+/* --- TAMPILAN GUEST (User Abu) --- */
+.guest-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.icon-guest { width: 100px; margin-bottom: 20px; }
+.text-guest-bold { font-size: 18px; font-weight: 700; margin-bottom: 5px; }
+.text-guest-small { font-size: 14px; color: #666; margin-bottom: 15px; }
+.link-text-red { 
+    color: #FF4545; font-weight: 700; text-decoration: none; border-bottom: 1px solid #FF4545;
+}
+
+/* --- TAMPILAN EMPTY STATE (Folder + Tombol) --- */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+.icon-folder { width: 80px; margin-bottom: 20px; opacity: 0.4; }
+.text-empty { font-size: 16px; font-weight: 600; margin-bottom: 40px; color: #333; }
+
+/* Tombol Merah */
+.btn-big-red {
+  background-color: #FF5858;
+  color: white;
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 25px;
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 15px rgba(255, 88, 88, 0.3);
+  cursor: pointer;
+}
+.btn-big-red img { width: 24px; }
+
+/* ... CSS Container, Guest, Empty State yang lama JANGAN DIHAPUS ... */
+/* ... Paste kode di bawah ini di bagian paling bawah file ... */
+
+/* --- TABLE LIST VIEW (Sesuai Gambar) --- */
+
+.recipe-table {
+    width: 100%;
+    padding: 10px 0;
+}
+
+.table-header {
+    display: flex;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    /* Memberi jarak kiri biar sejajar sama list yang ada nomornya */
+    padding-left: 30px; 
+}
+
+.col-name {
+    flex: 2; /* Lebar 2 bagian */
+    font-weight: 700;
+    color: #888;
+    font-size: 14px;
+}
+
+.col-status {
+    flex: 1; /* Lebar 1 bagian */
+    font-weight: 700;
+    color: #888;
+    font-size: 14px;
+}
+
+.col-action {
+    width: 60px; /* Lebar fix buat tombol */
+}
+
+/* Baris Data */
+.table-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #000;
+    font-weight: 600;
+}
+
+.col-num {
+    width: 30px; /* Kolom Nomor */
+    color: #888;
+    text-align: left;
+}
+
+.col-name-val {
+    flex: 2;
+    padding-right: 10px;
+}
+
+.col-status-val {
+    flex: 1;
+}
+
+/* Tombol Detail Kecil */
+.btn-detail-outline {
+    background: transparent;
+    border: 1px solid #FF5858;
+    color: #FF5858;
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+}
+
+/* Penyesuaian Layout Utama */
+.header-padding {
+    padding: 20px 20px 0 20px;
+}
+
+.content-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    /* Kalau list, align start (atas). Kalau kosong/guest, align center. */
+    /* Kita pakai default stretch, nanti child-nya yang ngatur */
+    padding: 20px 30px; 
+    overflow-y: auto; /* Biar list bisa discroll */
+    margin-bottom: 80px; /* Jarak tombol */
+}
+
+/* Agar Empty State & Guest State tetap di tengah */
+.empty-state, .guest-state {
+    margin-top: auto;
+    margin-bottom: auto;
+    align-self: center;
+    text-align: center;
+}
+
+/* --- STYLE FORM (Untuk Page TambahResep) --- */
+.form-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 20px;
+}
+.form-resep {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.form-group label {
+    font-size: 14px; font-weight: 600; margin-bottom: 8px; display: block;
+}
+.form-group input, .form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #FFC09C;
+    border-radius: 10px;
+    background: white;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+.placeholder-box {
+    border: 2px dashed #FFC09C;
+    border-radius: 10px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FF853A;
+    font-weight: 600;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.5);
+}
+.fixed-bottom-btn {
+    padding: 20px;
+    background-color: #FFFBF5;
+}

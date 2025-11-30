@@ -1,11 +1,11 @@
 import React from "react";
 import Navbar from "../components/navbar";
-import Header from "../components/header"
+import Header from "../components/header";
 
 const MakandiLuar = () => {
   return (
     <div>
-    <Header title="apaaa" backLink={"home"}/>
+    <Header title="Hai" backLink={"/home"}/>
     <Navbar/>
     </div>
   );

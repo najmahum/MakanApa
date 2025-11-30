@@ -1,0 +1,104 @@
+/* Container Utama */
+.detail-container {
+  background-color: #EFEFEF; /* Abu-abu terang sesuai gambar */
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Header Wrapper */
+.detail-header {
+  background-color: #FFFBF5; /* Cream Header */
+  padding: 0 20px 10px 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  z-index: 20;
+}
+
+/* Area Scroll Konten */
+.content-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 20px;
+  /* Hide scrollbar */
+  scrollbar-width: none;
+}
+.content-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hero Image (Gambar Besar) */
+.hero-image {
+  width: 100%;
+  height: 250px;
+  background-color: #ddd;
+  position: relative;
+}
+
+.hero-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Info Card (Waktu & Porsi) */
+.info-card {
+  background: white;
+  margin: -30px 20px 20px 20px; /* Margin top -30px biar naik ke atas gambar */
+  padding: 15px 20px;
+  border-radius: 12px;
+  border: 1px solid #FFC09C; /* Border orange tipis */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  position: relative; /* Biar ada di atas gambar */
+  z-index: 10;
+}
+
+.info-item {
+  font-size: 14px;
+  color: #000;
+  margin-bottom: 5px;
+}
+
+.info-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Card Konten (Bahan & Langkah) */
+.content-card {
+  background: white;
+  margin: 0 20px 20px 20px;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid #FFC09C;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.content-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  color: #000;
+}
+
+/* Styling List (Bullet Points) */
+.content-card ul {
+  padding-left: 20px; /* Jarak bullet point */
+  margin: 0;
+}
+
+.content-card li {
+  font-size: 14px;
+  line-height: 1.6; /* Jarak antar baris biar enak dibaca */
+  color: #333;
+  margin-bottom: 5px;
+}
+
+/* Khusus Langkah Memasak (Mungkin butuh style beda dikit) */
+.step-list li {
+  margin-bottom: 10px;
+}
+
+/* Spacer Bawah */
+.spacer-navbar {
+  height: 80px; /* Jarak aman biar konten paling bawah gak ketutup navbar */
+}

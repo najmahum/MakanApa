@@ -1,22 +1,27 @@
 import React from "react";
 import "../styles/home.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logoOranye from "../assets/logo/logo makanapa oranye.svg";
 import masak from "../assets/logo/masak sendiri.svg";
-import makan from "../assets/logo/makan diluar.svg"
+import makan from "../assets/logo/makan diluar.svg";
 import Navbar from "../components/navbar";
 
 const Home = () => {
+    const navigate = useNavigate();
+    const handleMulaiMasak = () => {
+        sessionStorage.removeItem("draftBahan");
+        navigate("/masukanbahan")
+    };
     return(
     <div className="Home-container">
         <Link to="/login" className="login-btn">Login</Link>
         <img src={logoOranye} alt="logo" className="logo"></img>
         <div className="button-container">
-            <div className="menu-button">
+            <div className="menu-button" onClick={handleMulaiMasak}>
                 <div className="icon-wrapper masak-bg">
                     <img src={masak} className="icon-image" alt="masak"/>
                 </div>
-                <Link to="/masukanbahan" className="masakSendiri">MASAK SENDIRI</Link>
+                <div className="masakSendiri">MASAK SENDIRI</div>
             </div>
 
             <div className="menu-button">
