@@ -1,0 +1,254 @@
+/* =======================================================
+   RESET & BASE
+======================================================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* =======================================================
+   PERMISSION PAGE
+======================================================= */
+.permission-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #faf7f2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+}
+
+.permission-content-wrapper {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =======================================================
+   PERMISSION CARD
+======================================================= */
+.permission-card {
+  background: white;
+  border-radius: 20px;
+  padding: 40px 30px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =======================================================
+   ICON
+======================================================= */
+.permission-icon-wrapper {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #ffe5e5 0%, #ffcccc 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  box-shadow: 0 4px 16px rgba(255, 82, 82, 0.2);
+}
+
+.permission-icon {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+/* =======================================================
+   TITLE
+======================================================= */
+.permission-title {
+  font-size: 17px;
+  font-weight: 600;
+  text-align: center;
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  max-width: 90%;
+}
+
+/* =======================================================
+   BUTTONS
+======================================================= */
+.permission-btn {
+  width: 100%;
+  padding: 16px 20px;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  text-align: center;
+}
+
+.permission-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Button: Saat menggunakan aplikasi */
+.permission-btn.allow {
+  background: linear-gradient(135deg, #ff853a 0%, #ff6a00 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(255, 133, 58, 0.3);
+}
+
+.permission-btn.allow:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(255, 133, 58, 0.4);
+  transform: translateY(-2px);
+}
+
+.permission-btn.allow:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Button: Hanya untuk kali ini */
+.permission-btn.once {
+  background: white;
+  color: #333;
+  border: 2px solid #e0e0e0;
+}
+
+.permission-btn.once:hover:not(:disabled) {
+  border-color: #ff853a;
+  background: #fff4eb;
+  transform: translateX(4px);
+}
+
+/* Button: Tolak */
+.permission-btn.deny {
+  background: transparent;
+  color: #666;
+  border: none;
+}
+
+.permission-btn.deny:hover:not(:disabled) {
+  color: #ff5252;
+  background: #fff0f0;
+}
+
+/* =======================================================
+   RESPONSIVE - MOBILE
+======================================================= */
+@media (max-width: 600px) {
+  .permission-page {
+    padding: 16px;
+  }
+
+  .permission-card {
+    padding: 32px 24px;
+  }
+
+  .permission-icon-wrapper {
+    width: 70px;
+    height: 70px;
+  }
+
+  .permission-icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .permission-title {
+    font-size: 16px;
+    max-width: 100%;
+  }
+
+  .permission-btn {
+    padding: 14px 18px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 400px) {
+  .permission-page {
+    padding: 12px;
+  }
+
+  .permission-card {
+    padding: 28px 20px;
+  }
+
+  .permission-title {
+    font-size: 15px;
+  }
+
+  .permission-btn {
+    padding: 13px 16px;
+    font-size: 13px;
+  }
+}
+
+/* =======================================================
+   RESPONSIVE - TABLET & DESKTOP
+======================================================= */
+@media (min-width: 768px) {
+  .permission-content-wrapper {
+    max-width: 550px;
+  }
+
+  .permission-card {
+    padding: 48px 40px;
+  }
+
+  .permission-icon-wrapper {
+    width: 90px;
+    height: 90px;
+  }
+
+  .permission-icon {
+    width: 54px;
+    height: 54px;
+  }
+
+  .permission-title {
+    font-size: 18px;
+  }
+
+  .permission-btn {
+    padding: 18px 24px;
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .permission-content-wrapper {
+    max-width: 600px;
+  }
+
+  .permission-card {
+    padding: 52px 44px;
+  }
+}
