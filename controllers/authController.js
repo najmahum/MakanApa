@@ -59,20 +59,24 @@ export const registerUser = async (req, res) => {
 // LOGIN
 export const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body
+    const { identifier, password } = req.body
 
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email dan password wajib diisi' })
+    if (!identifier || !password) {
+      return res.status(400).json({ error: 'Username/Email dan password wajib diisi' })
     }
 
     const { data: user, error } = await supabase
       .from('users')
       .select('*')
-      .eq('email', email)
+      .or(`email.eq.${identifier},username.eq.${identifier}`)
       .single()
 
     if (error || !user) {
-      return res.status(401).json({ error: 'Email tidak ditemukan' })
+      return res.status(401).json({ error: 'Akun tidak ditemukan' })
+    }
+
+    if (user.status === 'blocked') {
+       return res.status(403).json({ error: 'Akun diblokir, hubungi admin.' })
     }
 
     const match = await bcrypt.compare(password, user.password)
@@ -80,7 +84,6 @@ export const loginUser = async (req, res) => {
       return res.status(401).json({ error: 'Password salah' })
     }
 
-    // BUAT JWT
     const token = jwt.sign(
       { id_user: user.id_user, role: user.role },
       process.env.JWT_SECRET,
@@ -88,9 +91,15 @@ export const loginUser = async (req, res) => {
     )
 
     res.status(200).json({
-      message: "Login berhasil!",
+      success: true,
       token,
-      user
+      user: {
+        id: user.id_user,
+        nama: user.nama,
+        email: user.email,
+        username: user.username,
+        role: user.role
+      }
     })
 
   } catch (err) {

@@ -8,14 +8,25 @@ export const cariResep = async (req, res) => {
     }
 
     // URL API ML kamu di Render
-    const ML_API_URL = "https://makanapa.onrender.com/docs";
+    const ML_API_URL = "https://makanapa.onrender.com/rekomendasi/";
 
+        //gantiin body
+    const bahanString = bahanList.join(",");
+    const params = new URLSearchParams({ bahan: bahanString });
+    const finalUrl = `${ML_API_URL}?${params.toString()}`;
+    console.log("Membuka URL:", finalUrl);
+    
     // Kirim data bahan ke FastAPI di Render
-    const response = await fetch(ML_API_URL, {
-      method: "POST",
+    const response = await fetch(finalUrl, {
+      method: "GET",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ bahan: bahanList }),
+      //body: JSON.stringify({ bahan: bahanList }),
     });
+
+    //const response = await fetch(
+    //  ${ML_API_URL}?bahan=${encodeURIComponent(bahanList.join(","))},
+    //  { method: "GET" }
+    //);
 
     // Ambil hasil dari ML API
     if (!response.ok) {

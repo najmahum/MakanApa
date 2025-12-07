@@ -9,14 +9,16 @@ import detailResepRoutes from '../routes/resepDetailRoutes.js'
 import tambahResepRoutes from '../routes/tambahResepRoutes.js'
 import activityLogRoutes from "../routes/activityLogRoutes.js"
 import favoritRoutes from '../routes/favoritRoutes.js'
-import adminDashboardRoutes from './routes/adminDashboardRoutes.js'
-import adminUserRoutes from './routes/adminUserRoutes.js'
-import adminResepRoutes from './routes/adminResepRoutes.js'
-import profile from './routes/profieRoutes.js';
+import adminDashboardRoutes from '../routes/adminDashboardRoutes.js'
+import adminUserRoutes from '../routes/adminUserRoutes.js'
+import adminResepRoutes from '../routes/adminResepRoutes.js'
+import profile from '../routes/profileRoutes.js';
 dotenv.config()
 
 const app = express()
-app.use(cors())
+app.use(cors({
+  origin: process.env.REACT_APP_FRONTEND_URL 
+}))
 app.use(express.json())
 
 app.use((err, req, res, next) => {
