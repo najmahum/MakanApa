@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Filter, Search, Home, Heart, Folder, User, ArrowLeft } from "lucide-react";
+import { Filter, Search, ArrowLeft } from "lucide-react";
 import "../styles/MenuInputGuest.css";
 import Navbar from "../components/navbar.jsx";
 
@@ -50,7 +50,7 @@ export default function MenuInputGuest() {
 
   return (
     <div className="guest-container">
-
+      
       <div className="guest-inner">
         {/* Search box utama */}
         <div className="search-box">

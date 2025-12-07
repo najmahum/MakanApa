@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Star, ArrowLeft } from "lucide-react";
 import Navbar from "../components/navbar.jsx";
+import Header from "../components/header.jsx";
 import "../styles/RestaurantApp.css";
 
 export default function RestaurantApp() {
@@ -85,6 +86,7 @@ export default function RestaurantApp() {
         </button>
         <h1 className="header-title">Rekomendasi Tempat Makan</h1>
       </header>
+
 
       {/* Location Bar */}
       <div className="location-bar">

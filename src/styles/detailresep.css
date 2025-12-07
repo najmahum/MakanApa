@@ -102,3 +102,90 @@
 .spacer-navbar {
   height: 80px; /* Jarak aman biar konten paling bawah gak ketutup navbar */
 }
+
+/* Loading & Error Center */
+.loading-state, .error-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-weight: 600;
+  color: #888;
+  background-color: #FFFBF5;
+}
+
+.status-banner {
+  margin: 10px 20px 0 20px;
+  padding: 15px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 15px; /* Jarak ke gambar */
+}
+
+.status-banner.yellow {
+  background-color: #FFF4E5;
+  color: #663C00;
+  border: 1px solid #FFC09C;
+}
+
+.status-banner.red {
+  background-color: #FFE5E5;
+  color: #D32F2F;
+  border: 1px solid #FFCDD2;
+}
+
+.status-banner.green {
+  background-color: #E8F5E9;
+  color: #2E7D32;
+  border: 1px solid #C8E6C9;
+}
+
+.state-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+  color: #888;
+  font-weight: 600;
+}
+
+/* Kotak Status */
+.status-box {
+  margin: 15px 20px 0 20px; /* Di atas gambar */
+  padding: 15px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.status-box strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 16px;
+}
+
+.status-box p {
+  margin: 0;
+  opacity: 0.9;
+}
+
+/* Warna-warni Status */
+.yellow {
+  background-color: #FFF8E1;
+  border: 1px solid #FFECB3;
+  color: #F57F17;
+}
+
+.red {
+  background-color: #FFEBEE;
+  border: 1px solid #FFCDD2;
+  color: #D32F2F;
+}
+
+.green {
+  background-color: #E8F5E9;
+  border: 1px solid #C8E6C9;
+  color: #388E3C;
+}

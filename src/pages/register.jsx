@@ -1,96 +1,109 @@
-import React, { useState } from "react"; // 1. Import useState
-import { Link, useNavigate } from "react-router-dom"; // (Opsional, untuk pindah halaman)
-import "../styles/register.css";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import "../styles/register.css"; // CSS tetap register.css
 import logoOranye from "../assets/logo/logo makanapa oranye.svg";
+import Header from "../components/header"; // Tambah header biar ada tombol back
+import Integrasi from "../config/integrasi";
 
 const Register = () => {
-    // 2. Buat "state" untuk menampung data input
+    const navigate = useNavigate();
+
+    // 1. State Data
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const navigate = useNavigate(); // (Opsional, untuk pindah halaman)
+    const [isLoading, setIsLoading] = useState(false);
 
-    // 3. Ini fungsi yang akan berjalan saat form di-submit
+    // 2. Fungsi Submit
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Mencegah halaman refresh
+        e.preventDefault(); // Mencegah reload
 
-        // Ambil alamat API dari file .env frontend
-        const API_URL = process.env.REACT_APP_API_URL;
+        // Validasi
+        if(!username || !email || !password) {
+            alert("Semua data wajib diisi!");
+            return;
+        }
 
-        console.log("Mengirim data ke:", `${API_URL}/register`);
+        setIsLoading(true);
 
         try {
-            const response = await fetch(`${API_URL}/register`, { // 4. Panggil API
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    username: username,
-                    email: email,
-                    password: password,
-                    // Pastikan body ini sesuai dengan yang dibutuhkan backend-mu
-                }),
+            const response = await Integrasi.post("/api/auth/register", {
+                username: username,
+                email: email,
+                password: password
             });
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                // Kalau server kasih error (misal: "email sudah ada")
-                throw new Error(data.error || "Gagal mendaftar");
+            // 4. Jika Sukses
+            // Biasanya backend kirim status 200/201 atau object user
+            if (response.status === 200 || response.data) {
+                console.log("Registrasi sukses:", response.data);
+                alert("Registrasi berhasil! Silakan login.");
+                navigate("/login");
             }
 
-            // Jika sukses
-            console.log("Registrasi sukses:", data);
-            alert("Registrasi berhasil! Silakan login.");
-            navigate("/login"); // (Opsional) Pindahkan user ke halaman login
-
         } catch (error) {
-            // Kalau error (misal: server backend mati, CORS salah)
-            console.error("Error saat registrasi:", error.message);
-            alert(`Registrasi Gagal: ${error.message}`);
+            // 5. Handle Error
+            console.error("Error register:", error);
+            
+            if (error.response) {
+                // Ambil pesan error dari backend
+                const msg = error.response.data.error || "Gagal mendaftar.";
+                alert(msg);
+            } else {
+                alert("Gagal koneksi ke server.");
+            }
+            
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
-        // 5. Ubah <div> jadi <form> dan panggil handleSubmit
-        <form className="register-container" onSubmit={handleSubmit}> 
-            <p className="register-text">Register</p>
-            <img src={logoOranye} alt="logo" className="logo"></img>
+        <div className="register-container">
+            <Header title="Register" backLink="/Home" />
 
-            {/* 6. Hubungkan input ke "state" */}
-            <input
-                type="text"
-                placeholder="Username"
-                className="register-input"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-            />
-            <input
-                type="email" // Ganti type jadi "email" untuk validasi browser
-                placeholder="Email"
-                className="register-input"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-            />
-            <input
-                type="password"
-                placeholder="Password"
-                className="register-input"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-            />
+            <img src={logoOranye} alt="logo" className="logo" style={{marginTop: '20px'}} />
 
-            {/* 7. Buat <button> agar bisa submit */}
-            <button type="submit" className="register-button">Sign Up</button>
+            {/* Form */}
+            <div style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                <input
+                    type="text"
+                    placeholder="Username"
+                    className="register-input"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                />
+
+                <input
+                    type="email"
+                    placeholder="Email"
+                    className="register-input"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+
+                <input
+                    type="password"
+                    placeholder="Password"
+                    className="register-input"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+
+                {/* Tombol pakai onClick handler */}
+                <button 
+                    className="register-button" 
+                    onClick={handleSubmit} 
+                    disabled={isLoading}
+                >
+                    {isLoading ? "Loading..." : "Sign Up"}
+                </button>
+            </div>
 
             <p className="login">
-                Sudah punya akun? <Link to="/login">Login</Link>
+                Sudah punya akun? <Link to="/login" style={{fontWeight: 'bold'}}>Login</Link>
             </p>
-        </form>
+        </div>
     );
 };
 

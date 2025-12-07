@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/PermissionPage.css";
-import locationIcon from "../assets/location.svg";
+import locationIcon from "../assets/icons/location.svg";
 
 export default function PermissionPage() {
   const navigate = useNavigate();

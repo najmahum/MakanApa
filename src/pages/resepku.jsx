@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar";
-import Header from "../components/header"; // Pakai Header biar ada tombol back merah
+import Header from "../components/header";
+import Integrasi from "../config/integrasi"; // Import your Axios config
 import "../styles/resepku.css";
 
 // Import Assets
@@ -11,27 +12,53 @@ import AddFileIcon from "../assets/icons/addfile.svg";
 
 const ResepKu = () => {
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(true);
-  
-  // STATE RESEP (Nanti ini dari Backend)
-  // Aku isi Dummy Data biar tampilan LIST-nya muncul kayak di gambar
-  const [myRecipes, setMyRecipes] = useState([
-    { id: 1, name: "Telur Goreng Sawi", status: "Pending" },
-    { id: 2, name: "Tahu Crispy", status: "Approved" },
-    { id: 3, name: "Mie Sedaap Goreng", status: "Rejected" },
-  ]);
+  const [isLogin, setIsLogin] = useState(false);
+  const [myRecipes, setMyRecipes] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // Kalau mau liat tampilan Folder Kosong, ubah useState di atas jadi: useState([])
-
+  // 1. Check Login Status & Fetch Data
   useEffect(() => {
     const token = localStorage.getItem("userToken");
-    setIsLogin(!!token);
+    
+    if (token) {
+      setIsLogin(true);
+      fetchMyRecipes();
+    } else {
+      setIsLogin(false);
+    }
   }, []);
+
+  // 2. Fetch Function
+  const fetchMyRecipes = async () => {
+    try {
+      setLoading(true);
+      // Adjust endpoint to match your backend route for user's recipes
+      // Example: /api/resep/my-recipes or similar
+      const response = await Integrasi.get("/api/resep/user"); 
+      
+      // Assuming backend returns data in response.data.data
+      setMyRecipes(response.data.data || []); 
+    } catch (error) {
+      console.error("Failed to fetch recipes:", error);
+      // Optional: Handle error state here
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 3. Handle Detail Click
+  const handleDetailClick = (item) => {
+    navigate(`/resep/${item.id}`, { 
+        state: { 
+           isMyRecipe: true, 
+           status: item.status, 
+           feedback: item.feedback // Assuming backend sends feedback for rejected recipes
+        } 
+    });
+  };
 
   return (
     <div className="resep-ku-container">
-      
-      {/* Header dengan Back Button sesuai gambar */}
       <div className="header-padding">
         <Header title="Resepku" backLink="/home" />
       </div>
@@ -48,6 +75,12 @@ const ResepKu = () => {
             <Link to="/login" className="link-text-red">Login Sekarang</Link>
           </div>
 
+        ) : loading ? (
+           // === KONDISI LOADING ===
+           <div style={{textAlign: 'center', marginTop: '50px', color: '#888'}}>
+              Memuat resepmu...
+           </div>
+
         ) : myRecipes.length === 0 ? (
           
           // === KONDISI 2: LOGIN TAPI KOSONG (FOLDER) ===
@@ -58,34 +91,36 @@ const ResepKu = () => {
 
         ) : (
           
-          // === KONDISI 3: ADA DATA (LIST) - SESUAI GAMBAR BARU ===
+          // === KONDISI 3: ADA DATA (LIST) ===
           <div className="recipe-table">
-            
-            {/* Header Tabel */}
             <div className="table-header">
                <span className="col-name">Nama Resep</span>
                <span className="col-status">Status</span>
                <span className="col-action"></span>
             </div>
 
-            {/* List Item Loop */}
             {myRecipes.map((item, index) => (
               <div className="table-row" key={item.id}>
                  <span className="col-num">{index + 1}</span>
-                 <span className="col-name-val">{item.name}</span>
+                 <span className="col-name-val">{item.nama_resep || item.name}</span>
                  <span className="col-status-val">{item.status}</span>
                  <span className="col-action">
-                    <button className="btn-detail-outline">Detail</button>
+                <button 
+                  className="btn-detail-outline"
+                  onClick={() => handleDetailClick({
+                  })}
+                >
+                  Detail
+                </button>
                  </span>
               </div>
             ))}
-
           </div>
         )}
       </div>
 
-      {/* TOMBOL TAMBAH RESEP (Hanya muncul jika sudah login) */}
-      {isLogin && (
+      {/* TOMBOL TAMBAH RESEP */}
+      {isLogin && !loading && (
         <div className="fixed-bottom-btn">
           <button 
               className="btn-big-red" 

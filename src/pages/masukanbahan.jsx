@@ -5,10 +5,12 @@ import "../styles/masukanbahan.css";
 import Header from "../components/header";
 import ChefHat from "../assets/icons/chefhat.svg";
 import Tambah from "../assets/icons/tambah.svg";
-import Integrasi from "../config/integrasi";
+import Integrasi from "../config/integrasi"; // Pastikan path ini benar
 
 const InputBahan = () => {
   const navigate = useNavigate();
+  
+  // State
   const [namaBahan, setNamaBahan] = useState("");
   const [satuan, setSatuan] = useState("gram");
   const [jumlah, setJumlah] = useState(1);
@@ -20,6 +22,8 @@ const InputBahan = () => {
       return [];
     }
   });
+
+  // Effect Simpan Draft
   useEffect(() => {
     sessionStorage.setItem("draftBahan", JSON.stringify(listBahan));
   }, [listBahan]);
@@ -56,21 +60,29 @@ const InputBahan = () => {
       alert("Masukkan minimal satu bahan dulu!");
       return;
     }
+    
     try {
-      const response = await Integrasi.post("/resep/cari", {
-        bahan: listBahan
+      const response = await Integrasi.post("/api/resep/resep/cari", {
+        bahanList: listBahan
       });
+      
+      console.log("Hasil Cari Resep:", response.data);
+      
+      // Pindah ke Hasil Resep bawa data
       navigate("/hasilresep", { state: { hasil: response.data } });
+
     } catch (error) {
       console.error("Error cari resep:", error);
-      alert("Gagal mencari resep, cek koneksi backend.");
+      if(error.response) {
+          alert(`Gagal: ${error.response.data.error || "Terjadi kesalahan di server."}`);
+      } else {
+          alert("Gagal mencari resep, cek koneksi backend.");
+      }
     }
   };
 
   return (
     <div className="bahan-container">
-      
-      {/* BAGIAN 1: FIXED TOP (Header, Input, Judul List) */}
       <div className="fixed-top-section">
         <Header title="Masukkan Bahan yang Kamu Miliki" backLink={"/home"} />
         
@@ -108,11 +120,9 @@ const InputBahan = () => {
           </div>
         </div>
 
-        {/* Judul ditaruh di sini biar gak ikut nge-scroll */}
         <h3 style={{fontSize: '18px', color: '#666', margin: '10px 0'}}>Daftar Bahan Kamu</h3>
       </div>
 
-      {/* BAGIAN 2: SCROLL AREA (Isi List) */}
       <div className="scroll-area">
         {listBahan.length === 0 ? (
           <p className="empty-state">Belum ada bahan.</p>
@@ -127,7 +137,6 @@ const InputBahan = () => {
         )}
       </div>
 
-      {/* BAGIAN 3: FIXED BOTTOM (Tombol Cari) */}
       <div className="fixed-bottom-section">
         <button className="tombol-cari" onClick={handleCariResep}>
           <img src={ChefHat} alt="ChefHat" />

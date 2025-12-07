@@ -1,35 +1,53 @@
-// File: src/pages/Profile.jsx
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar";
 import "../styles/profile.css";
-
-// --- UBAH DI SINI ---
-// Hapus import UserOrange/UserGrey svg yang lama.
-// Ganti dengan import komponen baru:
-import ProfileIcon from "../assets/icons/profile.svg";
+import UserOrange from "../assets/icons/user-orange.svg"; 
+import UserGrey from "../assets/icons/user-gray.svg";       
 
 const Profile = () => {
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(true);
-
-  // (Data dummy user & useEffect tetap sama...)
-  const userData = {
-    username: "MakanYuk",
-    nama: "MakanYuk",
-    email: "MakanYuk@gmail.com",
-    password: "••••••••••"
-  };
+  const [isLogin, setIsLogin] = useState(false);
+  
+  // State User (Default kosong)
+  const [user, setUser] = useState({
+    username: "-",
+    nama: "-",
+    email: "-",
+    password: "••••••••••" // Password disensor (biasanya tidak disimpan di localstorage)
+  });
 
   useEffect(() => {
+    // 1. Ambil Token & Data User dari LocalStorage
     const token = localStorage.getItem("userToken");
-    if (token) {
+    const savedData = localStorage.getItem("userData");
+    
+    if (token && savedData) {
       setIsLogin(true);
+      
+      // 2. Parse Data JSON jadi Objek
+      try {
+        const parsedUser = JSON.parse(savedData);
+        setUser({
+            username: parsedUser.username || "-",
+            nama: parsedUser.nama || parsedUser.username || "-", // Fallback ke username kalau nama kosong
+            email: parsedUser.email || "-",
+            password: "••••••••••" 
+        });
+      } catch (e) {
+        console.error("Gagal membaca data user", e);
+      }
+    } else {
+      setIsLogin(false);
     }
   }, []);
 
   const handleLogout = () => {
+    // 3. Hapus Semua Data Sesi
     localStorage.removeItem("userToken");
+    localStorage.removeItem("userData");
+    sessionStorage.removeItem("draftBahan");
+    
     setIsLogin(false);
     navigate("/login");
   };
@@ -39,23 +57,34 @@ const Profile = () => {
       <h2 className="judul-halaman">Profile</h2>
 
       {isLogin ? (
-        /* --- TAMPILAN SUDAH LOGIN --- */
+        /* --- TAMPILAN SUDAH LOGIN (DATA ASLI) --- */
         <div className="content-login">
           
-          {/* --- UBAH BAGIAN ICON INI --- */}
-          {/* Kita pakai komponen, kirim warna ORANYE */}
-          <img src={ProfileIcon} alt="Profile"/>
+          <img src={UserOrange} alt="User" className="big-avatar" />
 
           <div className="card-data">
-             {/* ... (Isi card data user sama persis kayak sebelumnya) ... */}
-             {/* Saya singkat biar gak kepanjangan */}
-             <div className="data-row"><p className="label">Username</p><p className="value">{userData.username}</p></div>
+             <div className="data-row">
+                <p className="label">Username</p>
+                <p className="value">{user.username}</p>
+             </div>
              <div className="garis-batas"></div>
-             <div className="data-row"><p className="label">Nama</p><p className="value">{userData.nama}</p></div>
+             
+             <div className="data-row">
+                <p className="label">Nama</p>
+                <p className="value">{user.nama}</p>
+             </div>
              <div className="garis-batas"></div>
-             <div className="data-row"><p className="label">Email</p><p className="value">{userData.email}</p></div>
+             
+             <div className="data-row">
+                <p className="label">Email</p>
+                <p className="value">{user.email}</p>
+             </div>
              <div className="garis-batas"></div>
-             <div className="data-row"><p className="label">Password</p><p className="value">{userData.password}</p></div>
+             
+             <div className="data-row">
+                <p className="label">Password</p>
+                <p className="value">{user.password}</p>
+             </div>
           </div>
 
           <button className="btn-logout-orange" onClick={handleLogout}>
@@ -64,13 +93,10 @@ const Profile = () => {
         </div>
 
       ) : (
-        /* --- TAMPILAN BELUM LOGIN --- */
+        /* --- TAMPILAN BELUM LOGIN (GUEST) --- */
         <div className="content-guest">
           
-          {/* --- UBAH BAGIAN ICON INI --- */}
-          {/* Kita pakai komponen yang SAMA, tapi kirim warna ABU */}
-          {/* Kalau tidak kirim prop 'color', dia pakai default abu yang kita set di komponen */}
-          <img src={ProfileIcon} alt="Profile" />
+          <img src={UserGrey} alt="Guest" className="big-avatar" />
           
           <div className="text-wrapper">
             <p className="text-guest-bold">Wah kamu belum login..</p>

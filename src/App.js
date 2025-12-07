@@ -5,12 +5,17 @@ import Home from "./pages/home";
 import Login from "./pages/login";
 import Register from "./pages/register";
 import MasukanBahan from "./pages/masukanbahan";
-import MakandiLuar from "./pages/makandiluar";
 import HasilResep from "./pages/hasilresep";
 import DetailResep from "./pages/detailresep";
 import Favorite from "./pages/favorite";
 import Profile from "./pages/profile";
 import Resepku from "./pages/resepku";
+import PermissionPage from './pages/PermissionPage';
+import MenuInputGuest from './pages/MenuInputGuest';
+import RestaurantApp from './pages/RestaurantApp';
+import DetailView from './pages/DetailView';
+import DashboardSuperAdmin from "./pages/DashboardSuperAdmin";
+import UserInformationSuperAdmin from "./pages/UserInfo";
 
 function App() {
   return(
@@ -23,10 +28,15 @@ function App() {
         <Route path="/masukanbahan" element={<MasukanBahan/>} />
         <Route path="/hasilresep" element={<HasilResep/>} />
         <Route path="/detailresep" element={<DetailResep/>} />
-        <Route path="/makandiluar" element={<MakandiLuar/>} />
         <Route path="/favorite" element={<Favorite/>}/>
         <Route path="/profile" element={<Profile/>}/>
         <Route path="/resepku" element={<Resepku/>}/>
+        <Route path="/makandiluar" element={<PermissionPage />} />
+        <Route path="/menu" element={<MenuInputGuest />} />
+        <Route path="/restaurant" element={<RestaurantApp/>} />
+        <Route path="/detail" element={<DetailView />} />
+        <Route path="/dashboard" element={<DashboardSuperAdmin />} />
+        <Route path="/user-info" element={<UserInformationSuperAdmin />} />
       </Routes>
     </Router>
   );
