@@ -1,0 +1,40 @@
+/* Style Input Bahan yang lebih simpel */
+.ing-input {
+    flex: 1;
+    border: none;
+    border-bottom: 1px solid #CCC;
+    padding: 8px;
+    outline: none;
+}
+
+/* Modal Overlay (Copy dari Login.css kalau belum ada global) */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 250, 244, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+.modal-card {
+    background: white;
+    width: 80%;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+.btn-outline-red {
+    background: #FF5858;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+}

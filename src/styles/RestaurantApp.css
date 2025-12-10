@@ -1,0 +1,305 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.app-container {
+  font-family: 'Inter', sans-serif;
+  background: #faf7f2;
+  min-height: 100vh;
+}
+
+.view-container {
+  width: 100%;
+  min-height: calc(100vh - 60px); /* space untuk navbar */
+  background: #fffaf4;
+  padding-bottom: 80px;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: #faf7f2;
+  border-bottom: 1px solid #e0e0e0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.back-btn {
+  background: #ff853a;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fffaf4;
+  cursor: pointer;
+}
+
+.header-title {
+  flex: 1;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: #000000;
+}
+
+/* LOCATION BAR */
+.location-bar {
+  padding: 10px 14px;
+  background: #fbf0e6;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: center;
+  font-size: 13px;
+  color: #666;
+}
+
+.location-text {
+  font-size: 10px;
+  color: #818181;
+}
+
+/* SEARCH SECTION */
+.search-section {
+  padding: 16px;
+}
+
+.search-box-display {
+  padding: 12px;
+  font-weight: bold;
+  font-size: 16px;
+  border: 2px solid #fbc18f;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  text-align: center;
+  background: #f6f1ea;
+}
+
+.filter-info {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  text-align: center;
+  color: #666;
+}
+
+.filter-info span {
+  padding: 6px 10px;
+  background: #fbf0e6;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.result-info {
+  font-size: 14px;
+  color: #000000;
+}
+
+.result-info strong {
+  color: #ff853a;
+}
+
+/* RESTAURANT LIST */
+.restaurant-list {
+  padding: 0 16px;
+}
+
+.restaurant-card {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  border: 2px solid #fbc18f;
+  border-radius: 14px;
+  padding: 12px;
+  background: #f6f1ea;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.restaurant-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  border-color: #ff853a;
+}
+
+.restaurant-img {
+  width: 110px;
+  height: 110px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.restaurant-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.restaurant-name {
+  font-weight: bold;
+  font-size: 16px;
+  color: #333;
+}
+
+.specialty-text,
+.address-text {
+  font-size: 12px;
+  color: #666;
+}
+
+.restaurant-meta {
+  display: flex;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.rating {
+  background: linear-gradient(135deg,#ff853a,#ff6a00);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-weight: 600;
+}
+
+.distance,
+.price {
+  background: #f0f0f0;
+  color: #555;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+/* DETAIL RESTAURANT */
+.restaurant-detail {
+  padding: 16px;
+}
+
+.restaurant-main-info {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.restaurant-main-img {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.restaurant-info-block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* MENU */
+.menu-section h2 {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
+  gap: 16px;
+}
+
+.menu-card {
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: #fff;
+}
+
+.menu-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.menu-img {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+}
+
+.menu-info {
+  padding: 8px;
+}
+
+.menu-name {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: #333;
+}
+
+.menu-price {
+  font-weight: 600;
+  font-size: 13px;
+  color: #ff853a;
+}
+
+
+.nav-icon {
+  color: #888;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.nav-icon.active {
+  color: #ff853a;
+}
+
+.nav-icon:hover {
+  transform: scale(1.1);
+  color: #ff853a;
+}
+
+/* =======================================================
+   TOMBOL BACK
+======================================================= */
+.btn-back {
+  position: absolute;
+  top: 20px;
+  left: 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.back-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background-color: #ff853a;
+  border-radius: 50%;
+  color: white;
+  transition: transform 0.15s ease;
+}
+
+.back-circle:hover {
+  transform: scale(1.1);
+}
