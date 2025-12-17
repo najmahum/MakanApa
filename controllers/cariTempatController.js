@@ -2,9 +2,8 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-// Helper: Rumus Haversine untuk hitung jarak (km)
 function hitungJarak(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Radius bumi dalam km
+    const R = 6371; 
     const dLat = (lat2 - lat1) * (Math.PI / 180);
     const dLon = (lon2 - lon1) * (Math.PI / 180);
     const a =
@@ -35,10 +34,15 @@ export const cariTempatMakan = async (req, res) => {
             return res.status(400).json({ message: "Lokasi (lat, lng) wajib diisi!" });
         }
 
-        const keyword = query || "Rumah Makan"; 
         const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+
+        const geoUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
+        const geoRes = await fetch(geoUrl);
+        const geoData = await geoRes.json();
+        const userAddress = geoData.status === "OK" ? geoData.results[0].formatted_address : "Lokasi Tidak Diketahui";
         const searchRadius = 5000; 
 
+        const keyword = query || "Rumah Makan"; 
         const gmapsUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(keyword)}&location=${lat},${lng}&radius=${searchRadius}&type=restaurant&key=${apiKey}`;
 
         const response = await fetch(gmapsUrl);
@@ -106,6 +110,7 @@ export const cariTempatMakan = async (req, res) => {
         res.status(200).json({
             message: "Berhasil mengambil data",
             total: places.length,
+            user_address: userAddress,
             data: places 
         });
 
