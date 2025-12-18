@@ -17,6 +17,7 @@ import DetailView from './pages/DetailView';
 import DashboardSuperAdmin from "./pages/DashboardSuperAdmin";
 import UserInformationSuperAdmin from "./pages/UserInfo";
 import TambahResep from "./pages/tambahresep";
+import TambahResepDetail from "./pages/tambahresepdetail";
 
 function App() {
   return(
@@ -39,6 +40,7 @@ function App() {
         <Route path="/dashboard" element={<DashboardSuperAdmin />} />
         <Route path="/user-info" element={<UserInformationSuperAdmin />} />
         <Route path="/tambah-resep" element={<TambahResep />} />
+        <Route path="/tambah-resep-detail" element={<TambahResepDetail/>} />
       </Routes>
     </Router>
   );

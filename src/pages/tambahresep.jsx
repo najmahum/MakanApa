@@ -4,10 +4,12 @@ import Navbar from "../components/navbar";
 import Header from "../components/header";
 import "../styles/tambahresep.css";
 
+// Import Assets
+import AddDocIcon from "../assets/icons/addfile.svg"; 
+
 const TambahResep = () => {
   const navigate = useNavigate();
   
-  // State Step 1
   const [basicInfo, setBasicInfo] = useState({
     namaResep: "",
     deskripsi: "",
@@ -23,62 +25,33 @@ const TambahResep = () => {
         alert("Nama resep wajib diisi!");
         return;
     }
-    // Pindah ke Page 2 Sambil Bawa Data
+    // NAVIGASI KE FILE KEDUA (Bawa Data)
     navigate("/tambah-resep-detail", { state: { dataAwal: basicInfo } });
   };
 
   return (
     <div className="tambah-resep-container">
-      <Header title="Tambah Resep" backLink="/resep-kamu" />
+      <Header title="Tambah Resep" backLink="/Home" />
 
       <div className="form-content">
-        {/* Input Nama Resep */}
-        <div className="form-group-red">
+        <div className="form-group-box">
           <label>Nama Resep</label>
-          <input 
-            type="text" 
-            name="namaResep" 
-            className="ing-input" /* <-- Pake class dari CSS kamu */
-            placeholder="Masukkan disini" 
-            value={basicInfo.namaResep} 
-            onChange={handleChange}
-          />
+          <input type="text" name="namaResep" className="input-box-red" placeholder="Masukkan disini" value={basicInfo.namaResep} onChange={handleChange}/>
         </div>
 
-        {/* Input Deskripsi */}
-        <div className="form-group-red">
+        <div className="form-group-box">
           <label>Deskripsi</label>
-          <textarea 
-            name="deskripsi" 
-            className="ing-input" /* <-- Pake class dari CSS kamu */
-            placeholder="Masukkan disini" 
-            rows="3" 
-            value={basicInfo.deskripsi} 
-            onChange={handleChange}
-            style={{resize: "none"}} // Opsional: biar rapi
-          />
+          <input type="text" name="deskripsi" className="input-box-red" placeholder="Masukkan disini" value={basicInfo.deskripsi} onChange={handleChange}/>
         </div>
 
-        {/* Input Gambar */}
-        <div className="form-group-red">
+        <div className="form-group-box">
           <label>Link Gambar Masakan</label>
-          <input 
-            type="text" 
-            name="image" 
-            className="ing-input" /* <-- Pake class dari CSS kamu */
-            placeholder="Masukkan disini" 
-            value={basicInfo.image} 
-            onChange={handleChange}
-          />
-          <p className="hint">* Masukkan link gambar (jpg/png)</p>
+          <input type="text" name="image" className="input-box-red" placeholder="Masukkan disini" value={basicInfo.image} onChange={handleChange}/>
+          <p className="hint-text">* Masukkan link gambar dari browser dengan format "link.jpg" atau "link.png"</p>
         </div>
 
-        {/* Tombol Selanjutnya */}
-        <button 
-            className="btn-outline-red" /* <-- Pake class dari CSS kamu */
-            onClick={handleNext}
-            style={{ width: "100%", marginTop: "30px" }} /* Custom style dikit biar lebar */
-        >
+        <button className="btn-next-big" onClick={handleNext}>
+           <img src={AddDocIcon} alt="" className="btn-icon" /> 
            SELANJUTNYA
         </button>
       </div>
