@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar";
 import Header from "../components/header";
-import "../styles/tambahresep.css"; // CSS gabungan
+import "../styles/tambahresep.css";
 
 const TambahResep = () => {
   const navigate = useNavigate();
@@ -32,23 +32,53 @@ const TambahResep = () => {
       <Header title="Tambah Resep" backLink="/resep-kamu" />
 
       <div className="form-content">
+        {/* Input Nama Resep */}
         <div className="form-group-red">
           <label>Nama Resep</label>
-          <input type="text" name="namaResep" placeholder="Masukkan disini" value={basicInfo.namaResep} onChange={handleChange}/>
+          <input 
+            type="text" 
+            name="namaResep" 
+            className="ing-input" /* <-- Pake class dari CSS kamu */
+            placeholder="Masukkan disini" 
+            value={basicInfo.namaResep} 
+            onChange={handleChange}
+          />
         </div>
 
+        {/* Input Deskripsi */}
         <div className="form-group-red">
           <label>Deskripsi</label>
-          <textarea name="deskripsi" placeholder="Masukkan disini" rows="3" value={basicInfo.deskripsi} onChange={handleChange}/>
+          <textarea 
+            name="deskripsi" 
+            className="ing-input" /* <-- Pake class dari CSS kamu */
+            placeholder="Masukkan disini" 
+            rows="3" 
+            value={basicInfo.deskripsi} 
+            onChange={handleChange}
+            style={{resize: "none"}} // Opsional: biar rapi
+          />
         </div>
 
+        {/* Input Gambar */}
         <div className="form-group-red">
           <label>Link Gambar Masakan</label>
-          <input type="text" name="image" placeholder="Masukkan disini" value={basicInfo.image} onChange={handleChange}/>
+          <input 
+            type="text" 
+            name="image" 
+            className="ing-input" /* <-- Pake class dari CSS kamu */
+            placeholder="Masukkan disini" 
+            value={basicInfo.image} 
+            onChange={handleChange}
+          />
           <p className="hint">* Masukkan link gambar (jpg/png)</p>
         </div>
 
-        <button className="btn-big-red-bottom" onClick={handleNext}>
+        {/* Tombol Selanjutnya */}
+        <button 
+            className="btn-outline-red" /* <-- Pake class dari CSS kamu */
+            onClick={handleNext}
+            style={{ width: "100%", marginTop: "30px" }} /* Custom style dikit biar lebar */
+        >
            SELANJUTNYA
         </button>
       </div>

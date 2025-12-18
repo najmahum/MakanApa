@@ -16,6 +16,7 @@ import RestaurantApp from './pages/RestaurantApp';
 import DetailView from './pages/DetailView';
 import DashboardSuperAdmin from "./pages/DashboardSuperAdmin";
 import UserInformationSuperAdmin from "./pages/UserInfo";
+import TambahResep from "./pages/tambahresep";
 
 function App() {
   return(
@@ -37,6 +38,7 @@ function App() {
         <Route path="/detail" element={<DetailView />} />
         <Route path="/dashboard" element={<DashboardSuperAdmin />} />
         <Route path="/user-info" element={<UserInformationSuperAdmin />} />
+        <Route path="/tambah-resep" element={<TambahResep />} />
       </Routes>
     </Router>
   );

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar";
 import Header from "../components/header";
-import Integrasi from "../config/integrasi"; // Import your Axios config
+import Integrasi from "../config/integrasi";
 import "../styles/resepku.css";
 
 // Import Assets
@@ -32,11 +32,8 @@ const ResepKu = () => {
   const fetchMyRecipes = async () => {
     try {
       setLoading(true);
-      // Adjust endpoint to match your backend route for user's recipes
-      // Example: /api/resep/my-recipes or similar
       const response = await Integrasi.get("/api/resep/user"); 
       
-      // Assuming backend returns data in response.data.data
       setMyRecipes(response.data.data || []); 
     } catch (error) {
       console.error("Failed to fetch recipes:", error);
@@ -52,7 +49,7 @@ const ResepKu = () => {
         state: { 
            isMyRecipe: true, 
            status: item.status, 
-           feedback: item.feedback // Assuming backend sends feedback for rejected recipes
+           feedback: item.feedback
         } 
     });
   };
@@ -105,13 +102,13 @@ const ResepKu = () => {
                  <span className="col-name-val">{item.nama_resep || item.name}</span>
                  <span className="col-status-val">{item.status}</span>
                  <span className="col-action">
-                <button 
-                  className="btn-detail-outline"
-                  onClick={() => handleDetailClick({
-                  })}
-                >
-                  Detail
-                </button>
+                    {/* --- PERBAIKAN DI SINI --- */}
+                    <button 
+                      className="btn-detail-outline"
+                      onClick={() => handleDetailClick(item)} 
+                    >
+                      Detail
+                    </button>
                  </span>
               </div>
             ))}
