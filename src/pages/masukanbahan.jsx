@@ -5,11 +5,11 @@ import "../styles/masukanbahan.css";
 import Header from "../components/header";
 import ChefHat from "../assets/icons/chefhat.svg";
 import Tambah from "../assets/icons/tambah.svg";
-import Integrasi from "../config/integrasi"; // Pastikan path ini benar
+import Integrasi from "../config/integrasi";
 
 const InputBahan = () => {
   const navigate = useNavigate();
-  
+
   // State
   const [namaBahan, setNamaBahan] = useState("");
   const [satuan, setSatuan] = useState("gram");
@@ -27,14 +27,14 @@ const InputBahan = () => {
   useEffect(() => {
     sessionStorage.setItem("draftBahan", JSON.stringify(listBahan));
   }, [listBahan]);
-  
-  const satuanOptions = ["gram", "kg", "ml", "liter", "ikat", "buah", "butir"];
+
+  const satuanOptions = ["gram", "kg", "ml", "liter", "ikat", "buah", "butir", "sdm", "sdt"];
 
   const tambahJumlah = () => setJumlah((prev) => prev + 1);
   const kurangJumlah = () => jumlah > 1 && setJumlah((prev) => prev - 1);
-  
+
   const InputManual = (e) => {
-    const val = parseInt(e.target.value); 
+    const val = parseInt(e.target.value);
     setJumlah(isNaN(val) ? 0 : val);
   };
 
@@ -44,7 +44,7 @@ const InputBahan = () => {
       id: Date.now(),
       nama: namaBahan,
       jumlah: jumlah,
-      satuan: satuan || "Pcs"
+      satuan: satuan || "" // Jika satuan kosong, biarkan kosong
     };
     setListBahan([...listBahan, bahanBaru]);
     setNamaBahan("");
@@ -55,19 +55,27 @@ const InputBahan = () => {
     setListBahan(listBahan.filter(item => item.id !== id));
   };
 
+  // --- BAGIAN YANG DIUBAH ---
   const handleCariResep = async () => {
     if (listBahan.length === 0) {
       alert("Masukkan minimal satu bahan dulu!");
       return;
     }
-    
+
+    // 1. Konversi array object menjadi array string sesuai format temanmu
+    // Format: "2 kg ayam"
+    const bahanListString = listBahan.map((item) => {
+        return `${item.jumlah} ${item.satuan} ${item.nama}`;
+    });
+
     try {
+      // 2. Kirim data yang sudah dikonversi (bahanListString)
       const response = await Integrasi.post("/api/resep/resep/cari", {
-        bahanList: listBahan
+        bahanList: bahanListString
       });
-      
+
       console.log("Hasil Cari Resep:", response.data);
-      
+
       // Pindah ke Hasil Resep bawa data
       navigate("/hasilresep", { state: { hasil: response.data } });
 
@@ -80,12 +88,13 @@ const InputBahan = () => {
       }
     }
   };
+  // ---------------------------
 
   return (
     <div className="bahan-container">
       <div className="fixed-top-section">
         <Header title="Masukkan Bahan yang Kamu Miliki" backLink={"/home"} />
-        
+
         <div className="input-card">
           <div className="form-group">
             <label>Nama Bahan</label>
@@ -129,6 +138,7 @@ const InputBahan = () => {
         ) : (
           listBahan.map((item) => (
             <div className="item-bahan" key={item.id}>
+              {/* Tampilan UI tetap menggunakan object agar rapi sesuai CSS */}
               <span className="nama">{item.nama}</span>
               <span className="info">{item.jumlah} {item.satuan}</span>
               <button className="hapus" onClick={() => handleHapusBahan(item.id)}>✕</button>

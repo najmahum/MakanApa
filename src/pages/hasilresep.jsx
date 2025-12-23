@@ -1,94 +1,162 @@
-import React, { useState } from "react"; // Hapus useEffect karena gak dipake lagi
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar";
 import Header from "../components/header";
 import "../styles/hasilresep.css";
-import ClockIcon from "../assets/icons/clock.svg"; 
+import ClockIcon from "../assets/icons/clock.svg";
 import CheckIcon from "../assets/icons/check.svg";
+import RedHeart from "../assets/icons/redheart.svg";
+import FavoriteEmpty from "../assets/icons/favorite.svg";
+import Integrasi from "../config/integrasi";
 
 const HasilResep = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  
-  const [recipes] = useState(location.state?.hasil || []);
 
-  const handleResepClick = (id) => {
-    navigate(`/resep/${id}`);
+  const [recipes, setRecipes] = useState([]);
+  const [favorites, setFavorites] = useState({});
+
+  useEffect(() => {
+    let rawData = location.state?.hasil;
+    if (!rawData) {
+        const savedSession = sessionStorage.getItem("hasilResepSession");
+        if (savedSession) rawData = JSON.parse(savedSession);
+    }
+    if (rawData) sessionStorage.setItem("hasilResepSession", JSON.stringify(rawData));
+
+    let listResep = [];
+    if (rawData?.data?.data?.rekomendasi && Array.isArray(rawData.data.data.rekomendasi)) {
+        listResep = rawData.data.data.rekomendasi;
+    } else if (rawData?.data?.rekomendasi && Array.isArray(rawData.data.rekomendasi)) {
+        listResep = rawData.data.rekomendasi;
+    } else if (rawData?.rekomendasi && Array.isArray(rawData.rekomendasi)) {
+        listResep = rawData.rekomendasi;
+    } else if (Array.isArray(rawData)) {
+        listResep = rawData;
+    }
+    setRecipes(listResep);
+    const fetchUserFavorites = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) return;
+
+            const response = await Integrasi.get("/api/favorit");
+            const dataFav = response.data.data;
+
+            const favMap = {};
+            dataFav.forEach(item => {
+                favMap[item.id_resep] = true;
+            });
+
+            setFavorites(favMap);
+        } catch (error) {
+            console.log("Gagal ambil data favorit (Mungkin belum login):", error);
+        }
+    };
+
+    fetchUserFavorites();
+  }, [location.state]);
+
+  const handleResepClick = (id) => navigate(`/resep/${id}`);
+  const handleCariLagi = () => {
+    sessionStorage.removeItem("hasilResepSession");
+    navigate("/masukanbahan");
+  };
+
+  // --- LOGIKA TOMBOL LOVE ---
+  const toggleFavorite = async (e, id) => {
+    e.stopPropagation();
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+        alert("Silakan login dulu untuk menyimpan resep favorit!");
+        return;
+    }
+
+    const isCurrentlyFav = favorites[id];
+    setFavorites(prev => ({ ...prev, [id]: !isCurrentlyFav }));
+
+    try {
+        if (isCurrentlyFav) {
+            await Integrasi.delete(`/api/favorit/${id}`);
+            console.log("Berhasil hapus favorit:", id);
+        } else {
+            await Integrasi.post("/api/favorit", { id_resep: id });
+            console.log("Berhasil tambah favorit:", id);
+        }
+    } catch (error) {
+        console.error("Gagal update favorit:", error);
+        setFavorites(prev => ({ ...prev, [id]: isCurrentlyFav }));
+        alert("Gagal menyimpan favorit. Cek koneksi internet.");
+    }
   };
 
   return (
     <div className="hasil-container">
-      {/* HEADER FIXED */}
       <div className="fixed-header">
         <Header title="Hasil Resep" backLink="/masukanbahan" />
       </div>
 
-      {/* SCROLLABLE LIST */}
       <div className="recipe-list-area">
-        
-        {/* LOGIC JUMLAH RESEP */}
         <p className="summary-text">
           Ditemukan <span className="highlight-number">{recipes.length}</span> Resep yang cocok dengan bahan Anda.
         </p>
 
-        {/* LOGIC JIKA KOSONG (0 Resep) */}
         {recipes.length === 0 ? (
             <div style={{textAlign: 'center', marginTop: '50px', color: '#888'}}>
-                <p>Yah, belum ada resep yang cocok :(</p>
-                <p style={{fontSize: '12px', marginTop: '5px'}}>Atau kamu belum mencari resep.</p>
-                
-                <button 
-                    onClick={() => navigate("/masukanbahan")} 
-                    style={{marginTop: '20px', padding: '10px 20px', background: '#FF5858', color: 'white', border: 'none', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold'}}
-                >
-                    Cari Bahan Lain
-                </button>
+                <p>Belum ada data resep.</p>
+                <button onClick={handleCariLagi} style={{marginTop: '20px', padding: '10px 20px', background: '#FF5858', color: 'white', border: 'none', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold'}}>Cari Bahan Lain</button>
             </div>
         ) : (
-            // LOGIC MAPPING RESEP (DARI BACKEND)
-            recipes.map((resep) => (
-            <div 
-                className="recipe-card" 
-                key={resep.id} 
-                onClick={() => handleResepClick(resep.id)}
-            >
-                {/* Gambar Resep */}
-                <div className="card-image">
-                    <img 
-                        src={resep.image || "https://via.placeholder.com/300x200?text=No+Image"} 
-                        alt={resep.title} 
-                        onError={(e) => { e.target.src = "https://via.placeholder.com/300x200?text=Error+Loading"; }}
-                    />
-                </div>
+            recipes.map((resep, index) => {
+                const currentId = resep.id_resep || index;
+                const isFav = favorites[currentId] || false;
 
-                {/* Info Resep */}
-                <div className="card-content">
-                    {/* Mengantisipasi perbedaan nama field dari backend (title vs Nama_Resep) */}
-                    <h3>{resep.title || resep.Nama_Resep || "Tanpa Judul"}</h3> 
-                    
-                    <div className="meta-info">
-                        {/* Badge Kecocokan */}
-                        {resep.match && (
-                            <div className="match-badge">
-                                <img src={CheckIcon} alt="match" />
-                                <span>Cocok {resep.match}% dengan bahanmu</span>
+                return (
+                    <div
+                        className="recipe-card"
+                        key={currentId}
+                        onClick={() => handleResepClick(currentId)}
+                    >
+                        <div className="card-image">
+                            <img
+                                src={resep.gambar || "https://via.placeholder.com/300x200?text=No+Image"}
+                                alt={resep.nama_resep}
+                                onError={(e) => { e.target.src = "https://via.placeholder.com/300x200?text=Error+Loading"; }}
+                            />
+                        </div>
+
+                        <div className="card-content">
+                            {/* Container untuk Teks (Kiri) */}
+                            <div className="card-text-info">
+                                <h3>{resep.nama_resep || "Tanpa Judul"}</h3>
+                                <div className="meta-info">
+                                    {resep.kecocokan && (
+                                        <div className="match-badge">
+                                            <img src={CheckIcon} alt="match" />
+                                            <span>Cocok {Math.round(resep.kecocokan)}%</span>
+                                        </div>
+                                    )}
+                                    <div className="time-info">
+                                        <img src={ClockIcon} alt="time" />
+                                        <span>{resep.durasi || "15"} Menit</span>
+                                    </div>
+                                </div>
                             </div>
-                        )}
 
-                        {/* Waktu Masak */}
-                        <div className="time-info">
-                            <img src={ClockIcon} alt="time" />
-                            <span>{resep.time || resep.Estimasi_Waktu || "15"} Menit</span>
+                            <button className="card-btn-love" onClick={(e) => toggleFavorite(e, currentId)}>
+                                <img
+                                    src={isFav ? RedHeart : FavoriteEmpty}
+                                    alt="favorite"
+                                />
+                            </button>
                         </div>
                     </div>
-                </div>
-            </div>
-            ))
+                );
+            })
         )}
-
         <div className="spacer-bottom"></div>
       </div>
-
       <Navbar />
     </div>
   );

@@ -29,7 +29,7 @@ function App() {
         <Route path="/register" element={<Register/>} />
         <Route path="/masukanbahan" element={<MasukanBahan/>} />
         <Route path="/hasilresep" element={<HasilResep/>} />
-        <Route path="/detailresep" element={<DetailResep/>} />
+        <Route path="/resep/:id" element={<DetailResep/>} />
         <Route path="/favorite" element={<Favorite/>}/>
         <Route path="/profile" element={<Profile/>}/>
         <Route path="/resepku" element={<Resepku/>}/>

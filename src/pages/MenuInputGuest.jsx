@@ -14,9 +14,9 @@ export default function MenuInputGuest() {
   const [selectedRating, setSelectedRating] = useState("");
 
   const hargaOptions = [
-    { label: "Rp 10.000 - Rp 30.000", value: { min: 10000, max: 30000 } },
-    { label: "Rp 30.000 - Rp 60.000", value: { min: 30000, max: 60000 } },
-    { label: "Rp 60.000+", value: { min: 60000, max: Infinity } },
+    { label: "Rp 10.000 - Rp 30.000", value: { min: 10000, max: 30000, category: 1 } },
+    { label: "Rp 30.000 - Rp 60.000", value: { min: 30000, max: 60000, category: 2 } },
+    { label: "Rp 60.000+", value: { min: 60000, max: 9999999, category: 3 } },
   ];
 
   const jarakOptions = [
@@ -31,14 +31,26 @@ export default function MenuInputGuest() {
     { label: "5 ⭐", value: 5 },
   ];
 
-  // Navigasi ke RestaurantApp
+  // ==============================
+  // 🔥 HANDLE SEARCH → PUSH TO RestaurantApp
+  // ==============================
   const handleSearch = () => {
+    const lat = localStorage.getItem("latitude");
+    const lng = localStorage.getItem("longitude");
+
+    if (!lat || !lng) {
+      alert("Lokasi tidak ditemukan. Tolong izinkan lokasi terlebih dahulu.");
+      return;
+    }
+
     navigate("/restaurant", {
       state: {
-        query: searchQuery,
-        harga: selectedHarga,
-        jarak: selectedJarak,
-        rating: selectedRating,
+        query: searchQuery || "",
+        lat,
+        lng,
+        jarak: selectedJarak || null,
+        priceCategory: selectedHarga?.category || null,
+        minRating: selectedRating || null,
       },
     });
   };
@@ -50,9 +62,9 @@ export default function MenuInputGuest() {
 
   return (
     <div className="guest-container">
-      
       <div className="guest-inner">
-        {/* Search box utama */}
+
+        {/* Search Box */}
         <div className="search-box">
           <Filter
             size={20}
@@ -70,26 +82,27 @@ export default function MenuInputGuest() {
           <Search size={20} className="icon-right" onClick={handleSearch} />
         </div>
 
-        {/* Tombol back dengan background bulat */}
+        {/* Back button */}
         <button className="btn-back" onClick={handleBack}>
-            <span className="back-circle">
-                <ArrowLeft size={22} />
-            </span>
+          <span className="back-circle">
+            <ArrowLeft size={22} />
+          </span>
         </button>
 
-
-        {/* Filter summary horizontal */}
+        {/* Filter summary */}
         {(selectedHarga || selectedJarak || selectedRating) && (
           <div className="filter-summary">
             {selectedHarga && (
               <div className="filter-box-summary">
                 Harga: Rp {selectedHarga.min.toLocaleString()} -{" "}
-                {selectedHarga.max === Infinity ? "+" : selectedHarga.max.toLocaleString()}
+                {selectedHarga.max === 9999999
+                  ? "+"
+                  : selectedHarga.max.toLocaleString()}
               </div>
             )}
             {selectedJarak && (
               <div className="filter-box-summary">
-                Jarak: {jarakOptions.find(j => j.value === selectedJarak)?.label}
+                Jarak: {jarakOptions.find((j) => j.value === selectedJarak)?.label}
               </div>
             )}
             {selectedRating && (
@@ -105,10 +118,11 @@ export default function MenuInputGuest() {
         </button>
       </div>
 
-      {/* Navbar komponen */}
       <Navbar active="home" />
 
-      {/* Modal Filter */}
+      {/* ============================
+          MODAL FILTER
+          ============================ */}
       {openFilter && (
         <div className="modal-overlay" onClick={() => setOpenFilter(false)}>
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
@@ -121,7 +135,9 @@ export default function MenuInputGuest() {
                 {hargaOptions.map((item) => (
                   <div
                     key={item.label}
-                    className={`filter-box ${isHargaSelected(item.value) ? "active" : ""}`}
+                    className={`filter-box ${
+                      isHargaSelected(item.value) ? "active" : ""
+                    }`}
                     onClick={() => setSelectedHarga(item.value)}
                   >
                     {item.label}
@@ -137,7 +153,9 @@ export default function MenuInputGuest() {
                 {jarakOptions.map((item) => (
                   <div
                     key={item.value}
-                    className={`filter-box ${selectedJarak === item.value ? "active" : ""}`}
+                    className={`filter-box ${
+                      selectedJarak === item.value ? "active" : ""
+                    }`}
                     onClick={() => setSelectedJarak(item.value)}
                   >
                     {item.label}
@@ -153,7 +171,9 @@ export default function MenuInputGuest() {
                 {ratingOptions.map((item) => (
                   <div
                     key={item.value}
-                    className={`filter-box ${selectedRating === item.value ? "active" : ""}`}
+                    className={`filter-box ${
+                      selectedRating === item.value ? "active" : ""
+                    }`}
                     onClick={() => setSelectedRating(item.value)}
                   >
                     {item.label}
@@ -162,10 +182,7 @@ export default function MenuInputGuest() {
               </div>
             </div>
 
-            <button
-              className="btn-apply-filter"
-              onClick={() => setOpenFilter(false)}
-            >
+            <button className="btn-apply-filter" onClick={() => setOpenFilter(false)}>
               Terapkan Filter
             </button>
           </div>

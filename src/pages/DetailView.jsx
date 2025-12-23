@@ -1,109 +1,155 @@
-import React, { useState } from "react";
-import "../styles/DetailView.css"; 
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, Star, MapPin } from "lucide-react";
 import Navbar from "../components/navbar.jsx";
+import Integrasi from "../config/integrasi";
+import "../styles/DetailView.css";
 
 export default function DetailView() {
   const navigate = useNavigate();
-  const handleBack = () => navigate(-1);
+  const location = useLocation();
 
+  // ==============================
+  // 🔥 DATA DARI RESTAURANTAPP
+  // ==============================
+  const initialData = location.state;
+
+  const [restaurant, setRestaurant] = useState(initialData || null);
+  const [loading, setLoading] = useState(!initialData);
+  const [error, setError] = useState("");
   const [showMap, setShowMap] = useState(false);
 
-  const selectedRestaurant = {
-    id: 1,
-    name: "Warmindo Pak Yanto",
-    address: "Jl. Srigunting Raya No. 12, Jebres",
-    specialty: "Aneka nasi, Bakmie",
-    rating: 4.9,
-    distance: 0.9,
-    priceRange: { min: 10000, max: 20000 },
-    image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&h=300&fit=crop",
-    lat: -7.5568,
-    lng: 110.8241,
-    menu: [
-      {
-        name: "Nasi Goreng Spesial",
-        price: 15000,
-        image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=300&h=300&fit=crop"
-      },
-      {
-        name: "Bakmie Ayam",
-        price: 12000,
-        image: "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=300&h=300&fit=crop"
-      },
-      {
-        name: "Teh Manis",
-        price: 5000,
-        image: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=300&h=300&fit=crop"
-      }
-    ]
+  // ==============================
+  // 🔥 FETCH JIKA HALAMAN DI-REFRESH
+  // ==============================
+  useEffect(() => {
+    if (restaurant || !initialData?.place_id) return;
+
+    setLoading(true);
+    Integrasi.get("/api/tempatmakan/detail", {
+      params: { place_id: initialData.place_id },
+    })
+      .then((res) => {
+        setRestaurant(res.data.data);
+      })
+      .catch(() => {
+        setError("Gagal mengambil detail restoran");
+      })
+      .finally(() => setLoading(false));
+  }, [initialData, restaurant]);
+
+  // ==============================
+  // 🔥 LOADING / ERROR HANDLER
+  // ==============================
+  if (loading) return <p className="loading-text">Memuat detail...</p>;
+  if (error) return <p className="error-text">{error}</p>;
+  if (!restaurant)
+    return (
+      <div style={{ padding: 20 }}>
+        <p>Data restoran tidak ditemukan.</p>
+        <button onClick={() => navigate(-1)}>Kembali</button>
+      </div>
+    );
+
+  // ==============================
+  // 🔥 GOOGLE MAPS URL (DINAMIS)
+  // ==============================
+  const mapsUrl =
+    restaurant.lat && restaurant.lng
+      ? `https://www.google.com/maps?q=${restaurant.lat},${restaurant.lng}&output=embed`
+      : null;
+
+  const openInGoogleMaps = () => {
+    if (restaurant.lat && restaurant.lng) {
+      window.open(
+        `https://www.google.com/maps/search/?api=1&query=${restaurant.lat},${restaurant.lng}`,
+        "_blank"
+      );
+    }
   };
 
-  const mapsUrlSimple = `https://www.google.com/maps?q=${selectedRestaurant.lat},${selectedRestaurant.lng}&output=embed`;
-
+  // ==============================
+  // 🔥 UI
+  // ==============================
   return (
     <div className="container-app">
-
-      {/* Back Button */}
-      <button className="btn-back" onClick={handleBack}>
+      {/* BACK BUTTON */}
+      <button className="btn-back" onClick={() => navigate(-1)}>
         <span className="back-circle">
           <ArrowLeft size={22} />
         </span>
       </button>
 
-      {/* Header Image */}
+      {/* HEADER IMAGE */}
       <div className="header-image-wrapper">
-        <img className="header-image" src={selectedRestaurant.image} alt={selectedRestaurant.name} />
+        <img
+          className="header-image"
+          src={restaurant.image || "/placeholder-food.jpg"}
+          alt={restaurant.name}
+          onError={(e) => (e.target.src = "/placeholder-food.jpg")}
+        />
         <div className="header-overlay"></div>
-        <h1 className="restaurant-title">{selectedRestaurant.name}</h1>
+        <h1 className="restaurant-title">{restaurant.name}</h1>
       </div>
 
-      {/* Content */}
+      {/* CONTENT */}
       <div className="content">
-
         <div className="info-section">
-          <p className="specialty">{selectedRestaurant.specialty}</p>
-          <p className="address">{selectedRestaurant.address}</p>
+          <p className="specialty">
+            {restaurant.types?.join(", ") || "Restoran"}
+          </p>
+
+          <p className="address">{restaurant.address}</p>
 
           <div className="meta-info">
-            <span className="meta-badge"><Star size={14} fill="#fff" /> {selectedRestaurant.rating}</span>
-            <span className="meta-badge">{selectedRestaurant.distance} km</span>
             <span className="meta-badge">
-              Rp {selectedRestaurant.priceRange.min.toLocaleString()} - {selectedRestaurant.priceRange.max.toLocaleString()}
+              <Star size={14} fill="#fff" /> {restaurant.rating || "-"}
             </span>
+
+            {restaurant.distance && (
+              <span className="meta-badge">
+                {restaurant.distance.toFixed(1)} km
+              </span>
+            )}
+
+            {restaurant.priceRange && (
+              <span className="meta-badge">
+                Rp {restaurant.priceRange.min.toLocaleString()} -{" "}
+                {restaurant.priceRange.max.toLocaleString()}
+              </span>
+            )}
           </div>
 
-          <button className="map-button" onClick={() => setShowMap(!showMap)}>
-            <MapPin size={18} />
-            {showMap ? "Sembunyikan Peta" : "Lihat di Peta"}
-          </button>
+          {/* 🔥 TOGGLE GOOGLE MAPS */}
+          {mapsUrl && (
+            <button
+              className="map-button"
+              onClick={() => setShowMap(!showMap)}
+            >
+              <MapPin size={18} />
+              {showMap ? "Sembunyikan Peta" : "Lihat di Peta"}
+            </button>
+          )}
         </div>
 
-        {showMap && (
+        {/* 🔥 GOOGLE MAPS */}
+        {showMap && mapsUrl && (
           <div className="map-container">
-            <iframe className="map-iframe" src={mapsUrlSimple} loading="lazy" />
+            <iframe
+              className="map-iframe"
+              src={mapsUrl}
+              loading="lazy"
+              title="Google Maps"
+            />
+            <button className="open-maps-button" onClick={openInGoogleMaps}>
+              <MapPin size={18} />
+              Buka di Google Maps
+            </button>
           </div>
         )}
-
-        <div className="menu-section">
-          <h2 className="menu-title">Menu Tersedia</h2>
-
-          <div className="menu-grid">
-            {selectedRestaurant.menu.map((item, i) => (
-              <div className="menu-card" key={i}>
-                <div className="menu-image-container">
-                  <img src={item.image} alt={item.name} className="menu-image" />
-                </div>
-                <h3 className="menu-name">{item.name}</h3>
-                <p className="menu-price">Rp {item.price.toLocaleString()}</p>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
-      {/* Navbar */}
+      {/* NAVBAR */}
       <Navbar active="home" />
     </div>
   );

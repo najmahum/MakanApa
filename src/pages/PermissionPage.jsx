@@ -2,75 +2,104 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/PermissionPage.css";
 import locationIcon from "../assets/icons/location.svg";
+import Integrasi from "../config/integrasi"; // axios instance
 
 export default function PermissionPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  // Handler untuk "Saat menggunakan aplikasi"
+  // ===============================
+  // IZINKAN SAAT MENGGUNAKAN APLIKASI
+  // ===============================
   const handleAllow = () => {
     setLoading(true);
-    
-    // Request geolocation
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          console.log('Location granted:', {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          });
-          
-          // Simpan ke state/localStorage jika perlu
-          localStorage.setItem('locationPermission', 'granted');
-          localStorage.setItem('latitude', position.coords.latitude);
-          localStorage.setItem('longitude', position.coords.longitude);
-        
-          // Navigate ke menu
-          navigate("/menu");
-        },
-        (error) => {
-          console.error('Location denied:', error);
-          alert('Izin lokasi ditolak. Anda tetap bisa melanjutkan tanpa lokasi.');
-          navigate("/menu");
-        }
-      );
-    } else {
-      alert('Geolocation tidak didukung di browser ini.');
+
+    if (!navigator.geolocation) {
+      alert("Geolocation tidak didukung di browser ini");
+      setLoading(false);
       navigate("/menu");
+      return;
     }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        try {
+          // 🔥 Request ke backend
+          const response = await Integrasi.get("/api/tempatmakan/cari", {
+            params: {
+              lat,
+              lng,
+            },
+          });
+
+          console.log("Response backend:", response.data);
+
+          // Simpan data penting
+          localStorage.setItem("locationPermission", "granted");
+          localStorage.setItem("latitude", lat);
+          localStorage.setItem("longitude", lng);
+          localStorage.setItem(
+            "tempatMakan",
+            JSON.stringify(response.data.data)
+          );
+
+          navigate("/menu");
+        } catch (error) {
+          console.error("Gagal mengambil data tempat makan:", error);
+          navigate("/menu");
+        } finally {
+          setLoading(false);
+        }
+      },
+      (error) => {
+        console.error("Izin lokasi ditolak:", error);
+        setLoading(false);
+        navigate("/menu");
+      }
+    );
   };
 
-  <img
-  src={locationIcon}
-  alt="location"
-  className="permission-icon"
-  style={{ width: 48, height: 48, display: "block" }}
-  />
-
-  // Handler untuk "Hanya untuk kali ini"
+  // ===============================
+  // IZINKAN HANYA SEKALI
+  // ===============================
   const handleOnce = () => {
     setLoading(true);
-    
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          console.log('Location granted (once):', position);
-          localStorage.setItem('locationPermission', 'once');
-          navigate("/menu");
-        },
-        (error) => {
-          console.error('Location denied:', error);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        try {
+          await Integrasi.get("/api/tempatmakan/cari", {
+            params: { lat, lng },
+          });
+
+          localStorage.setItem("locationPermission", "once");
+          localStorage.setItem("latitude", lat);
+          localStorage.setItem("longitude", lng);
+        } catch (error) {
+          console.error("Gagal request lokasi (once):", error);
+        } finally {
+          setLoading(false);
           navigate("/menu");
         }
-      );
-    } else {
-      navigate("/menu");
-    }
+      },
+      () => {
+        setLoading(false);
+        navigate("/menu");
+      }
+    );
   };
 
-  // Handler untuk "Tolak"
+  // ===============================
+  // TOLAK IZIN LOKASI
+  // ===============================
   const handleDeny = () => {
-    localStorage.setItem('locationPermission', 'denied');
+    localStorage.setItem("locationPermission", "denied");
     navigate("/menu");
   };
 
@@ -79,31 +108,35 @@ export default function PermissionPage() {
       <div className="permission-content-wrapper">
         <div className="permission-card">
           <div className="permission-icon-wrapper">
-            <img src={locationIcon} alt="location" className="permission-icon" />
+            <img
+              src={locationIcon}
+              alt="location"
+              className="permission-icon"
+            />
           </div>
-          
+
           <h2 className="permission-title">
-            Izinkan MakanApa? untuk mengakses lokasi perangkat ini?
+            Izinkan <strong>MakanApa?</strong> mengakses lokasi perangkat ini?
           </h2>
 
-          <button 
-            className="permission-btn allow" 
+          <button
+            className="permission-btn allow"
             onClick={handleAllow}
             disabled={loading}
           >
-            {loading ? 'Meminta izin...' : 'Saat menggunakan aplikasi'}
+            {loading ? "Meminta izin..." : "Saat menggunakan aplikasi"}
           </button>
 
-          <button 
-            className="permission-btn once" 
+          <button
+            className="permission-btn once"
             onClick={handleOnce}
             disabled={loading}
           >
             Hanya untuk kali ini
           </button>
 
-          <button 
-            className="permission-btn deny" 
+          <button
+            className="permission-btn deny"
             onClick={handleDeny}
             disabled={loading}
           >

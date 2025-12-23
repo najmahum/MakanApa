@@ -19,8 +19,9 @@ const DetailResep = () => {
     const getDetail = async () => {
       try {
         setLoading(true);
-        const response = await Integrasi.get(`/api/resepDetail/${id}`);
-        setResep(response.data.data);
+        const response = await Integrasi.get(`/api/resep/${id}`);
+        // Backend Node biasanya mengembalikan { success: true, data: { ...detail } }
+        setResep(response.data.data || response.data);
       } catch (err) {
         console.error("Gagal ambil detail:", err);
         setError("Gagal memuat resep. Mungkin resep sudah dihapus atau koneksi bermasalah.");
@@ -31,6 +32,16 @@ const DetailResep = () => {
 
     getDetail();
   }, [id]);
+
+  // Fungsi untuk memecah string langkah "step1--step2" menjadi array
+  const parseList = (data) => {
+    if (!data) return [];
+    if (Array.isArray(data)) return data;
+    if (typeof data === 'string') {
+      return data.split('--').filter(item => item.trim() !== "");
+    }
+    return [data];
+  };
 
   const backLink = isMyRecipe ? "/resep-kamu" : "/hasilresep";
   const pageTitle = resep?.nama_resep || "Detail Resep";
@@ -101,20 +112,18 @@ const DetailResep = () => {
             <div className="content-card">
               <h3>Bahan Utama:</h3>
               <ul>
-                {Array.isArray(resep.bahan)
-                  ? resep.bahan.map((item, index) => <li key={index}>{item}</li>)
-                  : <li>{resep.bahan}</li>
-                }
+                {parseList(resep.bahan).map((item, index) => (
+                   <li key={index}>{item}</li>
+                ))}
               </ul>
             </div>
 
             <div className="content-card">
               <h3>Langkah Memasak:</h3>
               <ul className="step-list">
-                {Array.isArray(resep.langkah)
-                  ? resep.langkah.map((step, index) => <li key={index}>{step}</li>)
-                  : <li>{resep.langkah}</li>
-                }
+                {parseList(resep.langkah).map((step, index) => (
+                   <li key={index}>{step}</li>
+                ))}
               </ul>
             </div>
           </>

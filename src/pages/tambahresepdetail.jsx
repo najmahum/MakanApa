@@ -66,7 +66,7 @@ const TambahResepDetail = () => {
 
     try {
         setLoading(true);
-        await Integrasi.post("/api/resep/add", finalData); // Sesuaikan endpoint
+        await Integrasi.post("/api/resep/tambah", finalData); // Sesuaikan endpoint
         setShowSuccessModal(true);
     } catch (error) {
         console.error(error);

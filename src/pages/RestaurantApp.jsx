@@ -1,85 +1,59 @@
 // src/pages/RestaurantApp.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Star, ArrowLeft } from "lucide-react";
 import Navbar from "../components/navbar.jsx";
-import Header from "../components/header.jsx";
+import Integrasi from "../config/integrasi";
 import "../styles/RestaurantApp.css";
 
 export default function RestaurantApp() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { query = "", harga = "", jarak = "", rating = "" } = location.state || {};
 
-  const [searchQuery] = useState(query);
-  const [selectedHarga] = useState(harga);
-  const [selectedJarak] = useState(jarak);
-  const [selectedRating] = useState(rating);
+  const stateData = location.state;
+  const savedData = JSON.parse(localStorage.getItem("searchParams") || "{}");
 
-  const restaurants = [
-    {
-      id: 1,
-      name: "Warmindo Pak Yanto",
-      address: "Jl. Srigunting Raya No. 12, Jebres",
-      specialty: "Aneka nasi, Bakmie",
-      rating: 4.9,
-      distance: 0.9,
-      priceRange: { min: 10000, max: 20000 },
-      image:
-        "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&h=300&fit=crop",
-      menu: [
-        { name: "Nasi Goreng Spesial", price: 15000 },
-        { name: "Bakmie Ayam", price: 12000 },
-        { name: "Teh Manis", price: 5000 },
-      ],
-    },
-    {
-      id: 2,
-      name: "Kantin Ceria",
-      address: "Jl. Cendrawasih Lor No. 17B, Jebres",
-      specialty: "Aneka nasi, Jajanan",
-      rating: 4.7,
-      distance: 1.4,
-      priceRange: { min: 10000, max: 25000 },
-      image:
-        "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400&h=300&fit=crop",
-      menu: [
-        { name: "Nasi Ayam Goreng", price: 18000 },
-        { name: "Bakso", price: 12000 },
-      ],
-    },
-  ];
+  const {
+    query = "",
+    lat = localStorage.getItem("latitude"),
+    lng = localStorage.getItem("longitude"),
+    jarak = null,
+    priceCategory = null,
+    minRating = null,
+  } = stateData || savedData;
 
-  // Filter otomatis sesuai search
-  const filteredRestaurants = restaurants.filter((r) => {
-    let hargaCond = true;
-    if (selectedHarga)
-      hargaCond =
-        r.priceRange.min >= parseInt(selectedHarga.min) &&
-        r.priceRange.max <= parseInt(selectedHarga.max);
+  const userAddress =
+    localStorage.getItem("userAddress") || "Berdasarkan lokasi Anda";
 
-    let jarakCond = true;
-    if (selectedJarak === "1") jarakCond = r.distance < 1;
-    else if (selectedJarak === "2") jarakCond = r.distance >= 1 && r.distance <= 3;
-    else if (selectedJarak === "3") jarakCond = r.distance > 3;
+  const [restaurants, setRestaurants] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-    let ratingCond = selectedRating ? r.rating >= parseInt(selectedRating) : true;
-    let queryCond = searchQuery
-      ? r.name.toLowerCase().includes(searchQuery.toLowerCase())
-      : true;
+  useEffect(() => {
+    if (!lat || !lng) {
+      setError("Lokasi tidak ditemukan");
+      setLoading(false);
+      return;
+    }
 
-    return hargaCond && jarakCond && ratingCond && queryCond;
-  });
+    setLoading(true);
 
-  const handleBack = () => {
-    navigate(-1);
-  };
+    Integrasi.get("/api/tempatmakan/cari", {
+      params: { query, lat, lng, jarak, priceCategory, minRating },
+    })
+      .then((res) => {
+        setRestaurants(res.data.data || []);
+      })
+      .catch(() => {
+        setError("Gagal mengambil data restoran");
+      })
+      .finally(() => setLoading(false));
+  }, [query, lat, lng, jarak, priceCategory, minRating]);
 
   return (
     <div className="app-container">
-      {/* Header */}
       <header className="header">
-        <button className="back-btn" onClick={handleBack}>
+        <button className="back-btn" onClick={() => navigate(-1)}>
           <span className="back-circle">
             <ArrowLeft size={22} />
           </span>
@@ -87,68 +61,73 @@ export default function RestaurantApp() {
         <h1 className="header-title">Rekomendasi Tempat Makan</h1>
       </header>
 
+      <div className="location-bar">📍 {userAddress}</div>
 
-      {/* Location Bar */}
-      <div className="location-bar">
-        Lokasi Anda: Jl. Srigunting Raya No.30, Jebres
-      </div>
-
-      {/* Search Summary */}
       <div className="search-section">
-        <div className="search-box-display">{searchQuery || "Nasi Goreng"}</div>
-        <div className="filter-info">
-          {selectedHarga && (
-            <span>
-              Harga: Rp {selectedHarga.min} - {selectedHarga.max}
-            </span>
-          )}
-          {selectedJarak && (
-            <span>
-              Jarak:{" "}
-              {selectedJarak === "1"
-                ? "< 1 km"
-                : selectedJarak === "2"
-                ? "1 - 3 km"
-                : "> 3 km"}
-            </span>
-          )}
-          {selectedRating && <span>Rating: ≥ {selectedRating} ⭐</span>}
+        <div className="search-box-display">
+          {query || "Semua Makanan"}
         </div>
-        <p className="result-info">
-          Ditemukan <strong>{filteredRestaurants.length}</strong> restoran sesuai
-          pencarian.
-        </p>
+
+        <div className="filter-info">
+          {priceCategory && <span>Harga: Kategori {priceCategory}</span>}
+          {jarak && (
+            <span>
+              Jarak: {jarak === 1 ? "< 1 km" : jarak === 2 ? "1 - 3 km" : "> 3 km"}
+            </span>
+          )}
+          {minRating && <span>Rating ≥ {minRating} ⭐</span>}
+        </div>
+
+        {!loading && (
+          <p className="result-info">
+            Ditemukan <strong>{restaurants.length}</strong> restoran
+          </p>
+        )}
       </div>
 
-      {/* List Restoran */}
+      {loading && <p className="loading-text">Memuat data...</p>}
+      {error && <p className="error-text">{error}</p>}
+
       <div className="restaurant-list">
-        {filteredRestaurants.map((r) => (
+        {restaurants.map((r) => (
           <div
-            key={r.id}
+            key={r.place_id}
             className="restaurant-card"
-            onClick={() => navigate("/detail", { state: r })}   // ← DITAMBAHKAN
+            onClick={() => navigate("/detail", { state: r })}
           >
-            <img src={r.image} alt={r.name} className="restaurant-img" />
+            <img
+              src={r.image || "/placeholder-food.jpg"}
+              alt={r.name}
+              className="restaurant-img"
+              onError={(e) => {
+                e.target.src = "/placeholder-food.jpg";
+              }}
+            />
+
             <div className="restaurant-info">
               <h3>{r.name}</h3>
-              <p className="specialty-text">{r.specialty}</p>
+              <p className="specialty-text">{r.types?.join(", ")}</p>
               <p className="address-text">{r.address}</p>
+
               <div className="restaurant-meta">
                 <span className="rating">
-                  <Star size={14} fill="#fff" /> {r.rating}
+                  <Star size={14} fill="#fff" /> {r.rating || "-"}
                 </span>
-                <span className="distance">{r.distance} km</span>
-                <span className="price">
-                  Rp {r.priceRange.min} - {r.priceRange.max}
+                <span className="distance">
+                  {r.distance?.toFixed(1)} km
                 </span>
+                {r.priceRange && (
+                  <span className="price">
+                    Rp {r.priceRange.min.toLocaleString()} -{" "}
+                    {r.priceRange.max.toLocaleString()}
+                  </span>
+                )}
               </div>
             </div>
           </div>
         ))}
       </div>
 
-
-      {/* Navbar */}
       <Navbar active="home" />
     </div>
   );
