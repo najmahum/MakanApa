@@ -39,7 +39,7 @@ app.get('/', async (req, res) => {
 app.use('/api/auth', authRoutes)
 app.use("/api/tempatmakan", tempatMakanRoutes)
 app.use('/api/resep', cariResepRoutes)
-app.use("/api/resepDetail", detailResepRoutes)
+app.use("/api", detailResepRoutes)
 app.use('/api/resep', tambahResepRoutes)
 app.use("/api/logs", activityLogRoutes)
 app.use('/api/favorit', favoritRoutes)

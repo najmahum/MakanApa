@@ -14,8 +14,8 @@ export const getDetailResep = async (req, res) => {
     // Query ke tabel resep
     const { data, error } = await supabase
       .from("resep")
-      .select("id, nama_resep, gambar, porsi, durasi, bahan, langkah")
-      .eq("id", id)
+      .select("id_resep, nama_resep, gambar, porsi, durasi, bahan, langkah")
+      .eq("id_resep", id)
       .single();
 
     if (error) throw error;

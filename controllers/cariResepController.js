@@ -40,7 +40,7 @@ export const cariResep = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Rekomendasi resep berhasil diambil",
-      data: result.resep || result, // sesuaikan sama struktur FastAPI kamu
+      data: result.resep || result,
     });
   } catch (err) {
     console.error("Error di cariResep:", err.message);
