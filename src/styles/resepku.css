@@ -140,10 +140,54 @@
 .btn-big-red:active { transform: scale(0.98); }
 .btn-big-red img { width: 20px; }
 
-/* States (Guest & Empty) */
-.guest-state, .empty-state { margin: auto; display: flex; flex-direction: column; align-items: center; text-align: center; }
-.icon-guest, .icon-folder { width: 100px; margin-bottom: 20px; opacity: 0.5; }
-.text-guest-bold { font-size: 18px; font-weight: 700; margin-bottom: 5px; color: #333; }
-.text-guest-small, .text-empty { font-size: 14px; color: #888; margin-bottom: 20px; }
-.text-empty { font-size: 16px; font-weight: 600; max-width: 200px; }
-.link-text-red { color: #FF5858; font-weight: 700; text-decoration: none; border-bottom: 1px solid #FF5858; padding-bottom: 2px; }
+/* =========================================
+   5. STATES (GUEST & EMPTY) 
+   ========================================= */
+
+/* Container Tengah */
+.guest-state, 
+.empty-state {
+  margin: auto; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: 50px; /* Samakan dengan Profile */
+}
+
+/* Icon (Samakan dengan .big-avatar di Profile) */
+.icon-guest, 
+.icon-folder { 
+  width: 100px; 
+  height: 100px;
+  margin-bottom: 30px; 
+  opacity: 0.5; /* Opacity opsional, hapus jika ingin hitam pekat */
+}
+
+/* Teks Bold (Samakan dengan .text-guest-bold di Profile) */
+.text-guest-bold { 
+  font-weight: 600;
+  font-size: 16px;
+  color: #000;
+  margin: 0 0 5px 0;
+}
+
+/* Teks Biasa (Samakan dengan .text-guest di Profile) */
+.text-guest-small, 
+.text-empty { 
+  font-weight: 400;
+  font-size: 14px;
+  color: #000; /* Profile pakai hitam, bukan abu-abu */
+  margin: 0 0 5px 0; /* Jarak dikit ke tombol login */
+}
+
+/* Link Merah (Samakan dengan .link-text di Profile) */
+.link-text-red { 
+  color: #FF5858; 
+  font-weight: 600; 
+  text-decoration: none; 
+  border-bottom: 1px solid #FF5858; 
+  padding-bottom: 2px;
+  font-size: 15px;
+  cursor: pointer;
+}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react"; 
 import "../styles/home.css";
 import { Link, useNavigate } from "react-router-dom";
 import logoOranye from "../assets/logo/logo makanapa oranye.svg";
@@ -8,14 +8,37 @@ import Navbar from "../components/navbar";
 
 const Home = () => {
     const navigate = useNavigate();
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    useEffect(() => {
+        const role = localStorage.getItem("role");
+
+        if (role === "admin") {
+            setIsAdmin(true);
+        }
+    }, []);
+
     const handleMulaiMasak = () => {
         sessionStorage.removeItem("draftBahan");
-        navigate("/masukanbahan")
+        navigate("/masukanbahan");
     };
+
     return(
     <div className="Home-container">
+        {isAdmin && (
+            <button 
+                className="admin-btn" 
+                onClick={() => navigate("/user-info")}
+            >
+                Dashboard Admin
+            </button>
+        )}
+
+        {/* Tombol Login */}
         <Link to="/login" className="login-btn">Login</Link>
+        
         <img src={logoOranye} alt="logo" className="logo"></img>
+        
         <div className="button-container">
             <div className="menu-button" onClick={handleMulaiMasak}>
                 <div className="icon-wrapper masak-bg">
@@ -36,4 +59,4 @@ const Home = () => {
     );
 }
 
-export default Home
+export default Home;

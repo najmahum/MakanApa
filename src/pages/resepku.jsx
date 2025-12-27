@@ -7,7 +7,7 @@ import "../styles/resepku.css";
 
 // Import Assets
 import FolderIcon from "../assets/icons/resepku.svg";
-import UserGrey from "../assets/icons/profile.svg";
+import UserGrey from "../assets/icons/user-gray.svg";
 import AddFileIcon from "../assets/icons/addfile.svg";
 
 const ResepKu = () => {

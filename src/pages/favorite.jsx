@@ -3,11 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar";
 import Header from "../components/header";
 import Integrasi from "../config/integrasi";
-import "../styles/resepku.css"; // PENTING: Pakai CSS yang sama dengan ResepKu
+import "../styles/resepku.css";
 
 // Import Assets
 import FolderIcon from "../assets/icons/resepku.svg";
-import UserGrey from "../assets/icons/profile.svg";
+import UserGrey from "../assets/icons/user-gray.svg";
 
 const Favorit = () => {
   const navigate = useNavigate();
@@ -35,9 +35,6 @@ const Favorit = () => {
       
       const rawData = response.data.data || [];
       
-      // 🔥 FIX PENTING: Ratakan Data (Flatten)
-      // Karena Backend kirim: { resep: { nama_resep: ... } }
-      // Kita ubah biar Tabel bisa bacanya gampang
       const cleanData = rawData.map(item => {
           if (item.resep) {
               return {
@@ -45,7 +42,6 @@ const Favorit = () => {
                   id_resep: item.resep.id_resep, // ID untuk navigasi
                   nama_resep: item.resep.nama_resep,
                   durasi: item.resep.durasi,
-                  // Favorit gak punya status, kita ganti jadi kategori/info lain
                   info: item.resep.porsi ? `${item.resep.porsi} Porsi` : 'Disukai' 
               };
           }
@@ -61,7 +57,7 @@ const Favorit = () => {
   };
 
   const handleDetailClick = (id) => {
-    navigate(`/detailresep/${id}`); // Arahkan ke detail resep asli
+    navigate(`/resep/${id}`); // Arahkan ke detail resep
   };
 
   return (
@@ -78,7 +74,7 @@ const Favorit = () => {
           <div className="guest-state">
             <img src={UserGrey} alt="Guest" className="icon-guest" />
             <p className="text-guest-bold">Wah kamu belum login..</p>
-            <p className="text-guest-small">Login dulu untuk melihat resep yang kamu simpan!</p>
+            <p className="text-guest-small">Login untuk melihat resep yang kamu simpan!</p>
             <Link to="/login" className="link-text-red">Login Sekarang</Link>
           </div>
 

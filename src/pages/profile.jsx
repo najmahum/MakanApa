@@ -100,9 +100,8 @@ const Profile = () => {
           
           <div className="text-wrapper">
             <p className="text-guest-bold">Wah kamu belum login..</p>
-            <Link to="/login" className="link-text">
-                <p className="text-guest">Login untuk mengatur profilemu!</p>
-            </Link>
+            <p className="text-guest">Login untuk mengatur profilemu!</p>
+            <Link to="/login" className="link-text">Login Sekarang</Link>
           </div>
         </div>
       )}

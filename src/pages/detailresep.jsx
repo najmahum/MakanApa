@@ -54,7 +54,7 @@ const DetailResep = () => {
         }
     }
 
-    // Kalau bukan JSON, pake split '--' (kode lamamu)
+    // Kalau bukan JSON, pake split '--'
     if (typeof data === 'string') {
       return data.split('--').filter(item => item.trim() !== "");
     }
@@ -70,7 +70,7 @@ const DetailResep = () => {
     });
   };
 
-  const backLink = isMyRecipe ? "/resepku" : "/hasil-resep"; // Sesuaikan path ini
+  const backLink = isMyRecipe ? "/resepku" : "/hasilresep"; // Sesuaikan path ini
   const pageTitle = resep?.nama_resep || "Detail Resep";
 
   return (
