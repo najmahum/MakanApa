@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar";
 import Header from "../components/header";
 import Integrasi from "../config/integrasi";
@@ -8,23 +8,27 @@ import "../styles/detailresep.css";
 const DetailResep = () => {
   const { id } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const { isMyRecipe, status, feedback } = location.state || {};
 
   const [resep, setResep] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // STATE BARU: Untuk handle gambar error
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     const getDetail = async () => {
       try {
         setLoading(true);
         const response = await Integrasi.get(`/api/resep/${id}`);
-        // Backend Node biasanya mengembalikan { success: true, data: { ...detail } }
+        // Handle struktur response backend
         setResep(response.data.data || response.data);
       } catch (err) {
         console.error("Gagal ambil detail:", err);
-        setError("Gagal memuat resep. Mungkin resep sudah dihapus atau koneksi bermasalah.");
+        setError("Gagal memuat resep.");
       } finally {
         setLoading(false);
       }
@@ -33,17 +37,40 @@ const DetailResep = () => {
     getDetail();
   }, [id]);
 
-  // Fungsi untuk memecah string langkah "step1--step2" menjadi array
+  // FUNGSI PARSE LIST (LEBIH PINTAR)
+  // Bisa baca format ["a", "b"] maupun "a--b"
   const parseList = (data) => {
     if (!data) return [];
-    if (Array.isArray(data)) return data;
+    if (Array.isArray(data)) return data; 
+    
+    // Cek apakah stringnya format JSON Array?
+    if (typeof data === 'string' && data.trim().startsWith('[')) {
+        try {
+            // Bersihkan tanda kutip satu (') jadi dua (") biar valid JSON
+            const validJson = data.replace(/'/g, '"');
+            return JSON.parse(validJson);
+        } catch (e) {
+            console.log("Bukan JSON, lanjut split biasa");
+        }
+    }
+
+    // Kalau bukan JSON, pake split '--' (kode lamamu)
     if (typeof data === 'string') {
       return data.split('--').filter(item => item.trim() !== "");
     }
     return [data];
   };
 
-  const backLink = isMyRecipe ? "/resep-kamu" : "/hasilresep";
+  const handleEdit = () => {
+    navigate(`/tambah-resep`, {
+      state: { 
+        isEdit: true, 
+        resepData: resep 
+      } 
+    });
+  };
+
+  const backLink = isMyRecipe ? "/resepku" : "/hasil-resep"; // Sesuaikan path ini
   const pageTitle = resep?.nama_resep || "Detail Resep";
 
   return (
@@ -54,50 +81,54 @@ const DetailResep = () => {
 
       <div className="content-scroll">
         {loading && (
-          <div className="state-center">
-            <p>Sedang memuat resep...</p>
-          </div>
+          <div className="state-center"><p>Sedang memuat resep...</p></div>
         )}
 
         {!loading && error && (
           <div className="state-center">
-            <p style={{color: '#FF5858', textAlign: 'center', padding: '20px'}}>{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              style={{marginTop: '10px', padding: '8px 16px', borderRadius: '10px', border:'1px solid #ccc', background:'white'}}
-            >
-              Coba Lagi
-            </button>
+            <p style={{color: '#FF5858'}}>{error}</p>
+            <button onClick={() => window.location.reload()}>Coba Lagi</button>
           </div>
         )}
 
         {!loading && !error && resep && (
           <>
-            {isMyRecipe && status === "Pending" && (
+            {/* --- STATUS BANNERS --- */}
+            {isMyRecipe && status === "pending" && (
               <div className="status-banner yellow">
                 ⚠️ <strong>Menunggu Persetujuan</strong>
                 <p>Resep ini sedang direview oleh admin.</p>
               </div>
             )}
-            {isMyRecipe && status === "Rejected" && (
+            {isMyRecipe && status === "rejected" && (
               <div className="status-banner red">
                 ⛔ <strong>Resep Ditolak</strong>
                 <p>Alasan: {feedback || "Tidak memenuhi standar."}</p>
               </div>
             )}
-            {isMyRecipe && status === "Approved" && (
+            {isMyRecipe && status === "approved" && (
               <div className="status-banner green">
                 ✅ <strong>Resep Aktif</strong>
                 <p>Resepmu sudah tayang.</p>
               </div>
             )}
 
+            {/* --- LOGIC GAMBAR BARU --- */}
             <div className="hero-image">
-              <img
-                src={resep.gambar || "https://via.placeholder.com/400x300?text=No+Image"}
-                alt={resep.nama_resep}
-                onError={(e) => { e.target.src = "https://via.placeholder.com/400x300?text=Error"; }}
-              />
+              {imageError || !resep.gambar ? (
+                // TAMPILAN KOTAK WARNA (JIKA NULL/ERROR)
+                <div className="image-fallback-big">
+                    <span>{resep.nama_resep}</span>
+                </div>
+              ) : (
+                // TAMPILAN GAMBAR ASLI
+                <img
+                  src={resep.gambar}
+                  alt={resep.nama_resep}
+                  onError={() => setImageError(true)}
+                  className="img-full"
+                />
+              )}
             </div>
 
             <div className="info-card">
@@ -110,8 +141,8 @@ const DetailResep = () => {
             </div>
 
             <div className="content-card">
-              <h3>Bahan Utama:</h3>
-              <ul>
+              <h3>Bahan:</h3>
+              <ul className="custom-list">
                 {parseList(resep.bahan).map((item, index) => (
                    <li key={index}>{item}</li>
                 ))}
@@ -120,12 +151,21 @@ const DetailResep = () => {
 
             <div className="content-card">
               <h3>Langkah Memasak:</h3>
-              <ul className="step-list">
+              <ul className="custom-list-ordered">
                 {parseList(resep.langkah).map((step, index) => (
                    <li key={index}>{step}</li>
                 ))}
               </ul>
             </div>
+
+            {/* TOMBOL EDIT */}
+            {isMyRecipe && (
+                <div style={{marginTop: '30px', marginBottom: '20px'}}>
+                    <button className="btn-edit-big" onClick={handleEdit}>
+                        EDIT RESEP INI
+                    </button>
+                </div>
+            )}
           </>
         )}
 

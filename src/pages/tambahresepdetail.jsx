@@ -12,46 +12,99 @@ const TambahResepDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Ambil Data dari Step 1
-  const dataAwal = location.state?.dataAwal || {};
+  // 1. AMBIL DATA DARI STEP 1 (Termasuk isEdit, resepId, oldData)
+  const { dataAwal, isEdit, resepId, oldData } = location.state || {};
 
-  // State Step 2
+  // --- HELPER 1: PARSE LIST (JSON atau Strip) ---
+  const parseList = (data) => {
+    if (!data) return [];
+    if (Array.isArray(data)) return data; 
+    if (typeof data === 'string' && data.trim().startsWith('[')) {
+        try { return JSON.parse(data.replace(/'/g, '"')); } catch(e){}
+    }
+    return typeof data === 'string' ? data.split('--') : [data];
+  };
+
+  // --- HELPER 2: PARSE BAHAN STRING KE OBJECT (LOGIC SULIT) ---
+  // Mengubah "Bawang Merah 5 Siung" menjadi { nama: "Bawang Merah", jumlah: "5", satuan: "Siung" }
+  const parseBahanToObj = (strBahan) => {
+     const parts = strBahan.split(" ");
+     // Minimal harus ada 3 bagian: "Nama" "Jumlah" "Satuan"
+     if(parts.length >= 2) {
+         const satuan = parts.pop(); // Ambil paling belakang
+         const jumlah = parts.pop(); // Ambil depannya lagi
+         const nama = parts.join(" "); // Sisanya adalah nama
+         return { id: Date.now() + Math.random(), nama, jumlah, satuan };
+     }
+     // Fallback kalau formatnya aneh
+     return { id: Date.now() + Math.random(), nama: strBahan, jumlah: "1", satuan: "pcs" };
+  };
+
+  const satuanOptions = [
+    { label: "Gram (gr)", value: "gram" },
+    { label: "Kilogram (kg)", value: "kg" },
+    { label: "Mililiter (ml)", value: "ml" },
+    { label: "Liter (l)", value: "liter" },
+    { label: "Gelas", value: "gelas" },
+    { label: "Sendok Makan (sdm)", value: "sdm" },
+    { label: "Sendok Teh (sdt)", value: "sdt" },
+    { label: "Butir", value: "butir" },
+    { label: "Buah", value: "buah" },
+    { label: "Siung", value: "siung" },
+    { label: "Ekor", value: "ekor" },
+    { label: "Pcs", value: "pcs" },
+    { label: "Batang", value: "batang" },
+    { label: "Ikat", value: "ikat" },
+    { label: "Lembar", value: "lembar" },
+    { label: "Ruas", value: "ruas" },
+    { label: "Bungkus", value: "bungkus" },
+    { label: "Secukupnya", value: "secukupnya" },
+  ];
+
+  // 2. STATE STEP 2 (ISI DENGAN DATA LAMA JIKA EDIT)
   const [details, setDetails] = useState({
-    porsi: 1,
-    durasi: "",
-    bahan: [],
-    langkah: [""] 
+    porsi: isEdit ? oldData.porsi : 1,
+    durasi: isEdit ? oldData.durasi : "",
+    bahan: isEdit ? parseList(oldData.bahan).map(b => parseBahanToObj(b)) : [],
+    langkah: isEdit ? parseList(oldData.langkah) : [""] 
   });
 
-  const [tempBahan, setTempBahan] = useState({ nama: "", jumlah: 1, satuan: "Butir" });
+  const [tempBahan, setTempBahan] = useState({ nama: "", jumlah: "1", satuan: "gram" });
   const [loading, setLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // --- LOGIC BAHAN ---
+  const updateJumlah = (increment) => {
+    let currentVal = parseFloat(tempBahan.jumlah);
+    if (isNaN(currentVal)) currentVal = 0;
+    let newVal = currentVal + increment;
+    if (newVal < 0) newVal = 0;
+    setTempBahan({ ...tempBahan, jumlah: String(newVal) });
+  };
+
   const handleTambahBahan = () => {
     if (!tempBahan.nama) return;
     setDetails({
       ...details,
       bahan: [...details.bahan, { ...tempBahan, id: Date.now() }]
     });
-    setTempBahan({ nama: "", jumlah: 1, satuan: "Butir" }); // Reset
+    setTempBahan({ nama: "", jumlah: "1", satuan: "gram" }); 
   };
 
   const handleHapusBahan = (id) => {
     setDetails({ ...details, bahan: details.bahan.filter(b => b.id !== id) });
   };
 
-  // --- LOGIC LANGKAH ---
   const handleLangkahChange = (index, val) => {
     const newSteps = [...details.langkah];
     newSteps[index] = val;
     setDetails({ ...details, langkah: newSteps });
   };
-
-  // --- SUBMIT FINAL ---
+  const handleHapusLangkah = (index) => {
+    const newSteps = details.langkah.filter((_, i) => i !== index);
+    setDetails({ ...details, langkah: newSteps });
+  };
+  // 3. SUBMIT (BISA POST ATAU PUT)
   const handleSubmit = async () => {
-    // Format bahan jadi array string (sesuai kebutuhan backend)
-    // "Telur 2 Butir"
     const bahanFormatted = details.bahan.map(b => `${b.nama} ${b.jumlah} ${b.satuan}`);
 
     const finalData = {
@@ -66,19 +119,33 @@ const TambahResepDetail = () => {
 
     try {
         setLoading(true);
-        await Integrasi.post("/api/resep/tambah", finalData); // Sesuaikan endpoint
+        
+        if (isEdit) {
+            // === JALUR UPDATE (PUT) ===
+            await Integrasi.put(`/api/tambahresep/edit/${resepId}`, finalData);
+        } else {
+            // === JALUR BARU (POST) ===
+            await Integrasi.post("/api/tambahresep/tambah", finalData);
+        }
+
         setShowSuccessModal(true);
     } catch (error) {
         console.error(error);
-        alert("Gagal menyimpan resep.");
+        alert(isEdit ? "Gagal update resep." : "Gagal menyimpan resep.");
     } finally {
         setLoading(false);
     }
   };
 
+  // Judul Modal Berbeda Tergantung Edit/Baru
+  const modalTitle = isEdit ? "Resep berhasil diperbarui!" : "Resep kamu berhasil diajukan!";
+  const modalDesc = isEdit 
+    ? "Perubahan resepmu akan direview ulang oleh admin." 
+    : "Tunggu konfirmasi dari admin agar resep kamu dapat dipublikasikan";
+
   return (
     <div className="tambah-resep-container">
-      <Header title="Tambah Resep" backLink="/tambah-resep" />
+      <Header title={isEdit ? "Edit Detail" : "Tambah Resep"} backLink="/tambah-resep" />
 
       <div className="form-content">
         
@@ -101,10 +168,9 @@ const TambahResepDetail = () => {
             </div>
         </div>
 
-        {/* BOX INPUT BAHAN (KOTAK MERAH) */}
+        {/* BOX INPUT BAHAN */}
         <div className="section-label">Bahan-bahan</div>
         <div className="ingredient-form-box">
-            {/* Input Nama */}
             <div className="ing-row">
                 <label>Nama Bahan</label>
                 <input 
@@ -116,14 +182,18 @@ const TambahResepDetail = () => {
                 />
             </div>
             
-            {/* Input Jumlah & Satuan */}
             <div className="ing-row-bottom">
                 <div className="qty-group">
                     <label>Jumlah</label>
                     <div className="mini-counter">
-                            <button onClick={() => setTempBahan({...tempBahan, jumlah: Math.max(1, tempBahan.jumlah - 1)})}>−</button>
-                            <span>{tempBahan.jumlah}</span>
-                            <button onClick={() => setTempBahan({...tempBahan, jumlah: tempBahan.jumlah + 1})}>+</button>
+                            <button onClick={() => updateJumlah(-1)}>−</button>
+                            <input 
+                                type="text" 
+                                value={tempBahan.jumlah} 
+                                onChange={(e) => setTempBahan({...tempBahan, jumlah: e.target.value})}
+                                style={{ width: '50px', textAlign: 'center', border: 'none', outline: 'none', background: 'transparent', fontWeight: 'bold' }}
+                            />
+                            <button onClick={() => updateJumlah(1)}>+</button>
                     </div>
                 </div>
 
@@ -134,11 +204,11 @@ const TambahResepDetail = () => {
                         onChange={(e) => setTempBahan({...tempBahan, satuan: e.target.value})}
                         className="unit-select"
                     >
-                        <option value="Butir">Butir</option>
-                        <option value="Ikat">Ikat</option>
-                        <option value="Gram">Gram</option>
-                        <option value="Sdm">Sdm</option>
-                        <option value="Pcs">Pcs</option>
+                        {satuanOptions.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                            </option>
+                        ))}
                     </select>
                 </div>
 
@@ -173,6 +243,9 @@ const TambahResepDetail = () => {
                         value={step} 
                         onChange={(e)=>handleLangkahChange(idx, e.target.value)} 
                     />
+                    {details.langkah.length > 1 && (
+                        <span className="btn-remove-step" onClick={() => handleHapusLangkah(idx)}>✕</span>
+                    )}
                 </div>
             ))}
         </div>
@@ -183,21 +256,20 @@ const TambahResepDetail = () => {
         {/* TOMBOL SIMPAN */}
         <button className="btn-next-big" onClick={handleSubmit} disabled={loading}>
             <img src={AddDocIcon} alt="" className="btn-icon" /> 
-            {loading ? "MEMPROSES..." : "TAMBAH RESEP"}
+            {loading ? "MEMPROSES..." : (isEdit ? "SIMPAN PERUBAHAN" : "TAMBAH RESEP")}
         </button>
       </div>
 
       <Navbar />
 
-      {/* === LAYAR SUKSES (FULL SCREEN OVERLAY) === */}
+      {/* === LAYAR SUKSES === */}
       {showSuccessModal && (
         <div className="modal-overlay">
             <div className="modal-content-center">
-                <h3 className="title-center">Tambah Resep</h3>
                 <div className="success-body">
-                    <h3>Resep kamu berhasil diajukan!</h3>
-                    <p>Tunggu konfirmasi dari admin agar resep kamu dapat dipublikasikan</p>
-                    <button className="btn-pill-red" onClick={() => navigate("/resep-kamu")}>
+                    <h3>{modalTitle}</h3>
+                    <p>{modalDesc}</p>
+                    <button className="btn-pill-red" onClick={() => navigate("/resepku")}>
                         Kembali ke Halaman Resep
                     </button>
                 </div>

@@ -15,6 +15,7 @@ const HasilResep = () => {
 
   const [recipes, setRecipes] = useState([]);
   const [favorites, setFavorites] = useState({});
+  const [imgErrorState, setImgErrorState] = useState({});
 
   useEffect(() => {
     let rawData = location.state?.hasil;
@@ -35,6 +36,7 @@ const HasilResep = () => {
         listResep = rawData;
     }
     setRecipes(listResep);
+
     const fetchUserFavorites = async () => {
         try {
             const token = localStorage.getItem("token");
@@ -58,12 +60,12 @@ const HasilResep = () => {
   }, [location.state]);
 
   const handleResepClick = (id) => navigate(`/resep/${id}`);
+  
   const handleCariLagi = () => {
     sessionStorage.removeItem("hasilResepSession");
     navigate("/masukanbahan");
   };
 
-  // --- LOGIKA TOMBOL LOVE ---
   const toggleFavorite = async (e, id) => {
     e.stopPropagation();
 
@@ -79,16 +81,18 @@ const HasilResep = () => {
     try {
         if (isCurrentlyFav) {
             await Integrasi.delete(`/api/favorit/${id}`);
-            console.log("Berhasil hapus favorit:", id);
         } else {
             await Integrasi.post("/api/favorit", { id_resep: id });
-            console.log("Berhasil tambah favorit:", id);
         }
     } catch (error) {
         console.error("Gagal update favorit:", error);
         setFavorites(prev => ({ ...prev, [id]: isCurrentlyFav }));
         alert("Gagal menyimpan favorit. Cek koneksi internet.");
     }
+  };
+
+  const handleImageError = (id) => {
+    setImgErrorState((prev) => ({ ...prev, [id]: true }));
   };
 
   return (
@@ -112,6 +116,8 @@ const HasilResep = () => {
                 const currentId = resep.id_resep || index;
                 const isFav = favorites[currentId] || false;
 
+                const isImageValid = resep.gambar && !imgErrorState[currentId];
+
                 return (
                     <div
                         className="recipe-card"
@@ -119,15 +125,20 @@ const HasilResep = () => {
                         onClick={() => handleResepClick(currentId)}
                     >
                         <div className="card-image">
-                            <img
-                                src={resep.gambar || "https://via.placeholder.com/300x200?text=No+Image"}
-                                alt={resep.nama_resep}
-                                onError={(e) => { e.target.src = "https://via.placeholder.com/300x200?text=Error+Loading"; }}
-                            />
+                            {isImageValid ? (
+                                <img
+                                    src={resep.gambar}
+                                    alt={resep.nama_resep}
+                                    onError={() => handleImageError(currentId)}
+                                />
+                            ) : (
+                                <div className="no-image-placeholder">
+                                    <span>{resep.nama_resep || "Resep"}</span>
+                                </div>
+                            )}
                         </div>
 
                         <div className="card-content">
-                            {/* Container untuk Teks (Kiri) */}
                             <div className="card-text-info">
                                 <h3>{resep.nama_resep || "Tanpa Judul"}</h3>
                                 <div className="meta-info">

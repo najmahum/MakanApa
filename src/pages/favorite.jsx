@@ -2,44 +2,57 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/navbar";
 import Header from "../components/header";
-import Integrasi from "../config/integrasi"; // Import koneksi backend
-import "../styles/favorite.css";
+import Integrasi from "../config/integrasi";
+import "../styles/resepku.css"; // PENTING: Pakai CSS yang sama dengan ResepKu
 
 // Import Assets
-import SadFaceIcon from "../assets/icons/profile.svg";
-import ClockIcon from "../assets/icons/clock.svg";
-import HeartRedIcon from "../assets/icons/redheart.svg";
 import FolderIcon from "../assets/icons/resepku.svg";
+import UserGrey from "../assets/icons/profile.svg";
 
 const Favorit = () => {
   const navigate = useNavigate();
-  
-  // 1. DEFAULT STATE: FALSE (Belum Login)
   const [isLogin, setIsLogin] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // 2. CEK LOGIN & AMBIL DATA SAAT HALAMAN DIBUKA
+  // 1. CEK LOGIN (SAMA PERSIS DENGAN RESEPKU)
   useEffect(() => {
-    const token = localStorage.getItem("userToken");
+    const token = localStorage.getItem("userToken"); // Pakai userToken sesuai ResepKu
     
     if (token) {
       setIsLogin(true);
-      fetchFavorit(); // Ambil data kalau login
+      fetchFavorit();
     } else {
       setIsLogin(false);
     }
   }, []);
 
-  // 3. FUNGSI AMBIL DATA KE BACKEND
+  // 2. AMBIL DATA
   const fetchFavorit = async () => {
     try {
       setLoading(true);
-      // Sesuaikan endpoint dengan backend kamu (misal: /api/favorit)
       const response = await Integrasi.get("/api/favorit");
       
-      // Simpan data ke state (asumsi data ada di response.data.data)
-      setFavorites(response.data.data || []);
+      const rawData = response.data.data || [];
+      
+      // 🔥 FIX PENTING: Ratakan Data (Flatten)
+      // Karena Backend kirim: { resep: { nama_resep: ... } }
+      // Kita ubah biar Tabel bisa bacanya gampang
+      const cleanData = rawData.map(item => {
+          if (item.resep) {
+              return {
+                  id_fav: item.id_fav,
+                  id_resep: item.resep.id_resep, // ID untuk navigasi
+                  nama_resep: item.resep.nama_resep,
+                  durasi: item.resep.durasi,
+                  // Favorit gak punya status, kita ganti jadi kategori/info lain
+                  info: item.resep.porsi ? `${item.resep.porsi} Porsi` : 'Disukai' 
+              };
+          }
+          return item;
+      });
+
+      setFavorites(cleanData);
     } catch (error) {
       console.error("Gagal ambil favorit:", error);
     } finally {
@@ -47,74 +60,83 @@ const Favorit = () => {
     }
   };
 
-  const handleResepClick = (id) => {
-    // Arahkan ke Detail Resep (gunakan page yang sama dengan pencarian)
-    navigate(`/detailresep/${id}`);
+  const handleDetailClick = (id) => {
+    navigate(`/detailresep/${id}`); // Arahkan ke detail resep asli
   };
 
   return (
-    <div className="favorit-container">
-      <div className="fixed-header">
-         <Header title="Resep Favorit" backLink="/home" />
+    <div className="resep-ku-container">
+      <div className="header-padding">
+        <Header title="Resep Favorit" backLink="/home" />
       </div>
 
-      <div className="favorit-content">
+      <div className="content-area">
         
         {/* LOGIC TAMPILAN */}
         {!isLogin ? (
-          // --- KONDISI 1: BELUM LOGIN (GUEST) ---
-          <div className="fav-guest">
-            <img src={SadFaceIcon} alt="Sad" className="guest-icon-fav" />
-            <p className="guest-text-bold">Wah kamu belum login..</p>
-            <Link to="/login" className="link-text">
-                <p className="guest-text">Login untuk menyimpan resep favoritmu!</p>
-            </Link>
+          // === BELUM LOGIN ===
+          <div className="guest-state">
+            <img src={UserGrey} alt="Guest" className="icon-guest" />
+            <p className="text-guest-bold">Wah kamu belum login..</p>
+            <p className="text-guest-small">Login dulu untuk melihat resep yang kamu simpan!</p>
+            <Link to="/login" className="link-text-red">Login Sekarang</Link>
           </div>
 
         ) : loading ? (
-          // --- KONDISI 2: SEDANG LOADING ---
-          <div style={{textAlign: 'center', marginTop: '50px', color: '#888'}}>
-            Memuat resep favorit...
-          </div>
+           // === LOADING ===
+           <div style={{textAlign: 'center', marginTop: '50px', color: '#888'}}>
+             Memuat favoritmu...
+           </div>
 
         ) : favorites.length === 0 ? (
-          // --- KONDISI 3: SUDAH LOGIN TAPI KOSONG ---
-          <div className="fav-guest">
-             {/* Pakai icon folder atau sad face juga boleh */}
-             <img src={FolderIcon} alt="Kosong" style={{width: '80px', opacity: 0.5, marginBottom: '20px'}} />
-             <p className="guest-text-bold">Belum ada resep favorit</p>
-             <p className="guest-text">Yuk cari resep dan simpan di sini!</p>
+          
+          // === KOSONG ===
+          <div className="empty-state">
+            <img src={FolderIcon} alt="Empty" className="icon-folder" />
+            <p className="text-empty">Belum ada resep yang disukai</p>
           </div>
 
         ) : (
-          // --- KONDISI 4: ADA DATA (LIST RESEP) ---
-          <div className="fav-list-area">
-            {favorites.map((resep) => (
-              <div className="fav-card" key={resep.id} onClick={() => handleResepClick(resep.id)}>
-                {/* Gambar dengan Fallback */}
-                <img 
-                    src={resep.gambar || "https://via.placeholder.com/300x150?text=No+Image"} 
-                    alt={resep.nama_resep} 
-                    className="fav-img"
-                    onError={(e) => { e.target.src = "https://via.placeholder.com/300x150?text=Error"; }}
-                />
-                
-                <div className="fav-info">
-                  <h3>{resep.nama_resep}</h3>
-                  <div className="fav-meta">
-                    <div className="time">
-                        <img src={ClockIcon} alt="time" /> 
-                        {resep.durasi} Menit
-                    </div>
-                    <img src={HeartRedIcon} alt="love" className="love-icon" />
-                  </div>
-                </div>
+          
+          // === ADA DATA (TABEL GRID) ===
+          // Kita gunakan class CSS yang sama persis dengan ResepKu
+          <div className="recipe-table">
+            
+            {/* Header Tabel */}
+            <div className="table-header">
+               <span className="col-num"></span> 
+               <span className="col-name">Nama Resep</span>
+               <span className="col-status">Info</span> 
+               <span className="col-action"></span>
+            </div>
+
+            {/* List Data */}
+            {favorites.map((item, index) => (
+              <div className="table-row" key={item.id_fav || index}>
+                 {/* No */}
+                 <span className="col-num-val">{index + 1}</span>
+                 
+                 {/* Nama Resep */}
+                 <span className="col-name-val">{item.nama_resep}</span>
+                 
+                 {/* Info / Durasi / Porsi */}
+                 <span className="col-status-val">
+                    {item.info}
+                 </span>
+                 
+                 {/* Tombol Detail */}
+                 <span className="col-action">
+                    <button 
+                      className="btn-detail-outline"
+                      onClick={() => handleDetailClick(item.id_resep)} 
+                    >
+                      Detail
+                    </button>
+                 </span>
               </div>
             ))}
-            <div className="spacer-bottom"></div>
           </div>
         )}
-
       </div>
 
       <Navbar />

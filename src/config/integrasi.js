@@ -7,7 +7,7 @@ const Integrasi = axios.create({
 
 // --- BAGIAN INI SANGAT PENTING (INTERCEPTOR) ---
 Integrasi.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token'); // Ambil token dari penyimpanan
+  const token = localStorage.getItem('userToken'); // Ambil token dari penyimpanan
 
   if (token) {
     // Tempel token di header Authorization

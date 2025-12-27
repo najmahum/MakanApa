@@ -32,7 +32,7 @@ const ResepKu = () => {
   const fetchMyRecipes = async () => {
     try {
       setLoading(true);
-      const response = await Integrasi.get("/api/resep/user"); 
+      const response = await Integrasi.get("/api/tambahresep/user"); 
       
       setMyRecipes(response.data.data || []); 
     } catch (error) {
@@ -45,7 +45,7 @@ const ResepKu = () => {
 
   // 3. Handle Detail Click
   const handleDetailClick = (item) => {
-    navigate(`/resep/${item.id}`, { 
+    navigate(`/resep/${item.id_resep}`, { 
         state: { 
            isMyRecipe: true, 
            status: item.status, 
@@ -87,22 +87,24 @@ const ResepKu = () => {
           </div>
 
         ) : (
-          
           // === KONDISI 3: ADA DATA (LIST) ===
           <div className="recipe-table">
+            {/* Header Tabel */}
             <div className="table-header">
+               {/* Gunakan class yang sama dengan CSS */}
+               <span className="col-num"></span> 
                <span className="col-name">Nama Resep</span>
                <span className="col-status">Status</span>
                <span className="col-action"></span>
             </div>
 
+            {/* List Data */}
             {myRecipes.map((item, index) => (
-              <div className="table-row" key={item.id}>
-                 <span className="col-num">{index + 1}</span>
+              <div className="table-row" key={item.id_resep || index}>
+                 <span className="col-num-val">{index + 1}</span>
                  <span className="col-name-val">{item.nama_resep || item.name}</span>
                  <span className="col-status-val">{item.status}</span>
                  <span className="col-action">
-                    {/* --- PERBAIKAN DI SINI --- */}
                     <button 
                       className="btn-detail-outline"
                       onClick={() => handleDetailClick(item)} 

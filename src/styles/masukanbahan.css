@@ -69,7 +69,7 @@
   border-bottom: 1px solid #333;
   padding-bottom: 2px;
   padding-top: 8px;
-  width: 90px;
+  min-width: 90px;
   justify-content: space-between;
 }
 
@@ -81,8 +81,20 @@
   cursor: pointer;
 }
 
+/* Untuk Chrome, Safari, Edge, Opera */
+.jumlah input::-webkit-outer-spin-button,
+.jumlah input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Untuk Firefox */
+.jumlah input[type=number] {
+  appearance: textfield;
+}
+
 .jumlah input {
-  width: 30px;
+  width: 60px;
   text-align: center;
   border: none;
   outline: none;
