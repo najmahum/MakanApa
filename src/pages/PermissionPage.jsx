@@ -8,9 +8,6 @@ export default function PermissionPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  // ===============================
-  // IZINKAN SAAT MENGGUNAKAN APLIKASI
-  // ===============================
   const handleAllow = () => {
     setLoading(true);
 
@@ -27,24 +24,33 @@ export default function PermissionPage() {
         const lng = position.coords.longitude;
 
         try {
-          // 🔥 Request ke backend
+          // Request backend untuk daftar tempat makan
           const response = await Integrasi.get("/api/tempatmakan/cari", {
-            params: {
-              lat,
-              lng,
-            },
+            params: { lat, lng },
           });
 
-          console.log("Response backend:", response.data);
+          // ==============================
+          // Reverse geocoding Google Maps API
+          // ==============================
+          let address = "Berdasarkan lokasi Anda";
+          try {
+            const geocodeRes = await fetch(
+              `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`
+            );
+            const geocodeData = await geocodeRes.json();
+            if (geocodeData.results && geocodeData.results.length > 0) {
+              address = geocodeData.results[0].formatted_address;
+            }
+          } catch (err) {
+            console.error("Gagal mengambil alamat:", err);
+          }
 
-          // Simpan data penting
+          // Simpan data ke localStorage
           localStorage.setItem("locationPermission", "granted");
           localStorage.setItem("latitude", lat);
           localStorage.setItem("longitude", lng);
-          localStorage.setItem(
-            "tempatMakan",
-            JSON.stringify(response.data.data)
-          );
+          localStorage.setItem("tempatMakan", JSON.stringify(response.data.data));
+          localStorage.setItem("userAddress", address);
 
           navigate("/menu");
         } catch (error) {
@@ -62,9 +68,6 @@ export default function PermissionPage() {
     );
   };
 
-  // ===============================
-  // IZINKAN HANYA SEKALI
-  // ===============================
   const handleOnce = () => {
     setLoading(true);
 
@@ -74,13 +77,26 @@ export default function PermissionPage() {
         const lng = position.coords.longitude;
 
         try {
-          await Integrasi.get("/api/tempatmakan/cari", {
-            params: { lat, lng },
-          });
+          await Integrasi.get("/api/tempatmakan/cari", { params: { lat, lng } });
+
+          // Reverse geocoding Google Maps API
+          let address = "Berdasarkan lokasi Anda";
+          try {
+            const geocodeRes = await fetch(
+              `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`
+            );
+            const geocodeData = await geocodeRes.json();
+            if (geocodeData.results && geocodeData.results.length > 0) {
+              address = geocodeData.results[0].formatted_address;
+            }
+          } catch (err) {
+            console.error("Gagal mengambil alamat:", err);
+          }
 
           localStorage.setItem("locationPermission", "once");
           localStorage.setItem("latitude", lat);
           localStorage.setItem("longitude", lng);
+          localStorage.setItem("userAddress", address);
         } catch (error) {
           console.error("Gagal request lokasi (once):", error);
         } finally {
@@ -95,9 +111,6 @@ export default function PermissionPage() {
     );
   };
 
-  // ===============================
-  // TOLAK IZIN LOKASI
-  // ===============================
   const handleDeny = () => {
     localStorage.setItem("locationPermission", "denied");
     navigate("/menu");
@@ -108,11 +121,7 @@ export default function PermissionPage() {
       <div className="permission-content-wrapper">
         <div className="permission-card">
           <div className="permission-icon-wrapper">
-            <img
-              src={locationIcon}
-              alt="location"
-              className="permission-icon"
-            />
+            <img src={locationIcon} alt="location" className="permission-icon" />
           </div>
 
           <h2 className="permission-title">

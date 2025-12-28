@@ -15,10 +15,9 @@ const Favorit = () => {
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // 1. CEK LOGIN (SAMA PERSIS DENGAN RESEPKU)
+  // 1. CEK LOGIN
   useEffect(() => {
-    const token = localStorage.getItem("userToken"); // Pakai userToken sesuai ResepKu
-    
+    const token = localStorage.getItem("userToken");
     if (token) {
       setIsLogin(true);
       fetchFavorit();
@@ -27,25 +26,25 @@ const Favorit = () => {
     }
   }, []);
 
-  // 2. AMBIL DATA
+  // 2. AMBIL DATA FAVORIT
   const fetchFavorit = async () => {
     try {
       setLoading(true);
       const response = await Integrasi.get("/api/favorit");
-      
       const rawData = response.data.data || [];
-      
-      const cleanData = rawData.map(item => {
-          if (item.resep) {
-              return {
-                  id_fav: item.id_fav,
-                  id_resep: item.resep.id_resep, // ID untuk navigasi
-                  nama_resep: item.resep.nama_resep,
-                  durasi: item.resep.durasi,
-                  info: item.resep.porsi ? `${item.resep.porsi} Porsi` : 'Disukai' 
-              };
-          }
-          return item;
+
+      // Mapping data agar sesuai struktur tabel
+      const cleanData = rawData.map((item) => {
+        // Cek apakah data resep ada di dalam object (tergantung respons API)
+        const resepData = item.resep || item; 
+        
+        return {
+          id_fav: item.id_fav || item.id,
+          id_resep: resepData.id_resep,
+          nama_resep: resepData.nama_resep,
+          // Kita pakai kolom status untuk menampilkan Porsi/Durasi
+          info: resepData.porsi ? `${resepData.porsi} Porsi` : `${resepData.durasi || '-'} Menit`
+        };
       });
 
       setFavorites(cleanData);
@@ -57,7 +56,7 @@ const Favorit = () => {
   };
 
   const handleDetailClick = (id) => {
-    navigate(`/resep/${id}`); // Arahkan ke detail resep
+    navigate(`/resep/${id}`);
   };
 
   return (
@@ -67,14 +66,13 @@ const Favorit = () => {
       </div>
 
       <div className="content-area">
-        
         {/* LOGIC TAMPILAN */}
         {!isLogin ? (
           // === BELUM LOGIN ===
           <div className="guest-state">
             <img src={UserGrey} alt="Guest" className="icon-guest" />
             <p className="text-guest-bold">Wah kamu belum login..</p>
-            <p className="text-guest-small">Login untuk melihat resep yang kamu simpan!</p>
+            <p className="text-guest-small">Login untuk melihat resep simpananmu!</p>
             <Link to="/login" className="link-text-red">Login Sekarang</Link>
           </div>
 
@@ -85,7 +83,6 @@ const Favorit = () => {
            </div>
 
         ) : favorites.length === 0 ? (
-          
           // === KOSONG ===
           <div className="empty-state">
             <img src={FolderIcon} alt="Empty" className="icon-folder" />
@@ -93,34 +90,32 @@ const Favorit = () => {
           </div>
 
         ) : (
-          
           // === ADA DATA (TABEL GRID) ===
-          // Kita gunakan class CSS yang sama persis dengan ResepKu
           <div className="recipe-table">
             
             {/* Header Tabel */}
             <div className="table-header">
                <span className="col-num"></span> 
                <span className="col-name">Nama Resep</span>
-               <span className="col-status">Info</span> 
+               <span className="col-status">Info</span> {/* Judul kolom disesuaikan */}
                <span className="col-action"></span>
             </div>
 
             {/* List Data */}
             {favorites.map((item, index) => (
-              <div className="table-row" key={item.id_fav || index}>
-                 {/* No */}
+              <div className="table-row" key={index}>
+                 {/* 1. Nomor */}
                  <span className="col-num-val">{index + 1}</span>
                  
-                 {/* Nama Resep */}
+                 {/* 2. Nama Resep */}
                  <span className="col-name-val">{item.nama_resep}</span>
                  
-                 {/* Info / Durasi / Porsi */}
+                 {/* 3. Info (Porsi/Durasi) - Masuk ke slot Status */}
                  <span className="col-status-val">
                     {item.info}
                  </span>
                  
-                 {/* Tombol Detail */}
+                 {/* 4. Tombol Detail */}
                  <span className="col-action">
                     <button 
                       className="btn-detail-outline"

@@ -24,48 +24,54 @@
 
 
 /* =========================================
-   2. TABEL DENGAN CSS GRID (LAYOUT UTAMA)
+   2. TABEL (KITA KUNCI BIAR GAK KENA STYLE ADMIN)
+   Perhatikan ada '.resep-ku-container' di depannya
    ========================================= */
-.recipe-table {
+.resep-ku-container .recipe-table {
   width: 100%;
   margin-top: 20px;
   padding-bottom: 20px;
 }
 
 /* --- INDUK GRID (Header & Row) --- */
-/* Ini kuncinya! Kita atur lebar kolom langsung di induknya */
-.table-header, 
-.table-row {
+/* Kita pakai selector panjang biar MENANG lawan CSS Admin */
+.resep-ku-container .table-header, 
+.resep-ku-container .table-row {
   display: grid; 
-  /* RUMUS: [No: 40px] [Nama: SISA TEMPAT] [Status: 100px] [Tombol: 80px] */
+  /* RUMUS GRID: [No: 40px] [Nama: SISA] [Status: 100px] [Tombol: 80px] */
   grid-template-columns: 40px minmax(0, 1fr) 100px 80px; 
   
-  gap: 15px;      /* Jarak antar kolom */
+  gap: 15px;      
   align-items: center; 
   padding: 0 20px;
   width: 100%;
   box-sizing: border-box; 
 }
 
-/* Style Header */
-.table-header {
-  background-color: #FFDEC0;
-  padding-top: 12px;
-  padding-bottom: 12px;
+/* Style Header (WARNA PEACH) */
+.resep-ku-container .table-header {
+  background-color: #FFDEC0 !important; /* Pakai !important kalau masih bandel */
+  padding-top: 15px;
+  padding-bottom: 15px;
   border-radius: 12px;
   margin-bottom: 15px;
-  color: #888;
+  color: #8C8C8C;
   font-weight: 700;
   font-size: 15px;
+  border: none;
 }
 
 /* Style Row Data */
-.table-row {
+.resep-ku-container .table-row {
+  background-color: white;
+  padding: 18px 20px;
   margin-bottom: 20px;
   font-size: 16px;
   font-weight: 600;
   color: #000;
   border-bottom: 1px solid transparent; 
+  box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+  border-radius: 12px; /* Biar row-nya tumpul juga */
 }
 
 
@@ -74,55 +80,63 @@
    ========================================= */
 
 /* Kolom Nomor */
-.col-num, .col-num-val {
+.resep-ku-container .col-num, 
+.resep-ku-container .col-num-val {
   text-align: left;
   color: #999;
 }
 
-/* Kolom Nama (Agar bisa titik-titik ... kalau kepanjangan) */
-.col-name, .col-name-val {
+/* Kolom Nama */
+.resep-ku-container .col-name, 
+.resep-ku-container .col-name-val {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis; 
   text-align: left;
 }
 /* Header Text Color */
-.table-header .col-name { color: #888; }
+.resep-ku-container .table-header .col-name { color: #8C8C8C; }
 
 
-/* Kolom Status */
-.col-status, .col-status-val {
+/* Kolom Status / Info */
+.resep-ku-container .col-status, 
+.resep-ku-container .col-status-val {
   text-align: left;
 }
-.col-status-val {
+.resep-ku-container .col-status-val {
   text-transform: capitalize;
   color: #333;
+  font-size: 14px;
 }
 
-/* Kolom Action (Tombol ke Kanan) */
-.col-action {
+/* Kolom Action */
+.resep-ku-container .col-action {
   display: flex;
   justify-content: flex-end; 
 }
 
 
 /* =========================================
-   4. LAIN-LAIN (TOMBOL & STATES)
+   4. TOMBOL & LAINNYA
    ========================================= */
-.btn-detail-outline {
+.resep-ku-container .btn-detail-outline {
   background: transparent;
   border: 1px solid #FF5858;
   color: #FF5858;
   border-radius: 20px;
-  padding: 5px 15px;
+  padding: 6px 16px;
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap; 
 }
-.btn-detail-outline:hover { background-color: #FF5858; color: white; }
+.resep-ku-container .btn-detail-outline:hover { 
+  background-color: #FF5858; 
+  color: white; 
+}
 
+/* Bagian bawah ini aman gak perlu diubah selectornya */
 .fixed-bottom-btn {
   padding: 0 30px 20px 30px;
   margin-bottom: 80px;
@@ -140,54 +154,15 @@
 .btn-big-red:active { transform: scale(0.98); }
 .btn-big-red img { width: 20px; }
 
-/* =========================================
-   5. STATES (GUEST & EMPTY) 
-   ========================================= */
-
-/* Container Tengah */
-.guest-state, 
-.empty-state {
-  margin: auto; 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  margin-top: 50px; /* Samakan dengan Profile */
+/* STATES (GUEST & EMPTY) */
+.guest-state, .empty-state {
+  margin: auto; display: flex; flex-direction: column; align-items: center;
+  text-align: center; margin-top: 50px;
 }
-
-/* Icon (Samakan dengan .big-avatar di Profile) */
-.icon-guest, 
-.icon-folder { 
-  width: 100px; 
-  height: 100px;
-  margin-bottom: 30px; 
-  opacity: 0.5; /* Opacity opsional, hapus jika ingin hitam pekat */
-}
-
-/* Teks Bold (Samakan dengan .text-guest-bold di Profile) */
-.text-guest-bold { 
-  font-weight: 600;
-  font-size: 16px;
-  color: #000;
-  margin: 0 0 5px 0;
-}
-
-/* Teks Biasa (Samakan dengan .text-guest di Profile) */
-.text-guest-small, 
-.text-empty { 
-  font-weight: 400;
-  font-size: 14px;
-  color: #000; /* Profile pakai hitam, bukan abu-abu */
-  margin: 0 0 5px 0; /* Jarak dikit ke tombol login */
-}
-
-/* Link Merah (Samakan dengan .link-text di Profile) */
+.icon-guest, .icon-folder { width: 100px; height: 100px; margin-bottom: 30px; opacity: 0.5; }
+.text-guest-bold { font-weight: 600; font-size: 16px; color: #000; margin: 0 0 5px 0; }
+.text-guest-small, .text-empty { font-weight: 400; font-size: 14px; color: #000; margin: 0 0 5px 0; }
 .link-text-red { 
-  color: #FF5858; 
-  font-weight: 600; 
-  text-decoration: none; 
-  border-bottom: 1px solid #FF5858; 
-  padding-bottom: 2px;
-  font-size: 15px;
-  cursor: pointer;
+  color: #FF5858; font-weight: 600; text-decoration: none; 
+  border-bottom: 1px solid #FF5858; padding-bottom: 2px; font-size: 15px; cursor: pointer;
 }
