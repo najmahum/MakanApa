@@ -25,7 +25,6 @@ function mapPriceLevelToRupiahRange(level) {
     }
 }
 
-
 export const cariTempatMakan = async (req, res) => {
     try {
         const { query, lat, lng, jarak, priceCategory, minRating } = req.query; 
@@ -36,12 +35,13 @@ export const cariTempatMakan = async (req, res) => {
 
         const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
+        // Reverse geocoding
         const geoUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
         const geoRes = await fetch(geoUrl);
         const geoData = await geoRes.json();
         const userAddress = geoData.status === "OK" ? geoData.results[0].formatted_address : "Lokasi Tidak Diketahui";
+        
         const searchRadius = 5000; 
-
         const keyword = query || "Rumah Makan"; 
         const gmapsUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(keyword)}&location=${lat},${lng}&radius=${searchRadius}&type=restaurant&key=${apiKey}`;
 
@@ -53,7 +53,6 @@ export const cariTempatMakan = async (req, res) => {
         }
 
         let places = (data.results || []).map(r => {
-            
             const distanceKm = hitungJarak(
                 parseFloat(lat), parseFloat(lng), 
                 r.geometry.location.lat, r.geometry.location.lng
@@ -61,8 +60,10 @@ export const cariTempatMakan = async (req, res) => {
 
             const priceRange = mapPriceLevelToRupiahRange(r.price_level); 
 
-            return {
-                id: r.place_id, 
+            // 🔥 PASTIKAN lat/lng SELALU ADA DI RESPONSE
+            const restaurantData = {
+                id: r.place_id,
+                place_id: r.place_id, 
                 name: r.name,
                 address: r.formatted_address,
                 specialty: "Aneka Makanan", 
@@ -72,11 +73,21 @@ export const cariTempatMakan = async (req, res) => {
                 price_level: r.price_level || 0, 
                 image: r.photos 
                     ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${r.photos[0].photo_reference}&key=${apiKey}`
-                    : "https://via.placeholder.com/400x300?text=No+Image", 
-                menu: [{ name: "Menu Rekomendasi 1", price: priceRange.min }]
+                    : "https://via.placeholder.com/400x300?text=No+Image",
+                types: r.types || [],
+                menu: [{ name: "Menu Rekomendasi 1", price: priceRange.min }],
+                // 🔥 CRITICAL: Pastikan lat/lng ada
+                lat: r.geometry.location.lat,     
+                lng: r.geometry.location.lng
             };
+
+            // Debug log
+            console.log(`✅ ${r.name}: lat=${restaurantData.lat}, lng=${restaurantData.lng}`);
+            
+            return restaurantData;
         });
 
+        // Filter berdasarkan jarak
         if (jarak) {
             if (jarak === "1") places = places.filter(p => p.distance < 1);
             else if (jarak === "2") places = places.filter(p => p.distance >= 1 && p.distance <= 3);
@@ -89,23 +100,18 @@ export const cariTempatMakan = async (req, res) => {
 
         if (priceCategory) {
             const category = parseInt(priceCategory);
-            
             places = places.filter(p => {
                 const level = p.price_level;
-
-                if (category === 1) { 
-                    return level <= 1; 
-                } else if (category === 2) {
-                    return level === 2; 
-                } else if (category === 3) {
-                    return level >= 3; 
-                }
+                if (category === 1) return level <= 1; 
+                else if (category === 2) return level === 2; 
+                else if (category === 3) return level >= 3; 
                 return true; 
             });
         }
 
-
         places.sort((a, b) => a.distance - b.distance);
+
+        console.log(`📍 Total restoran: ${places.length}`);
 
         res.status(200).json({
             message: "Berhasil mengambil data",
@@ -115,7 +121,66 @@ export const cariTempatMakan = async (req, res) => {
         });
 
     } catch (err) {
-        console.error("Kesalahan di cariTempatMakan:", err);
-        res.status(500).json({ message: "Terjadi kesalahan server saat memproses data", error: err.message });
+        console.error("❌ Kesalahan di cariTempatMakan:", err);
+        res.status(500).json({ 
+            message: "Terjadi kesalahan server saat memproses data", 
+            error: err.message 
+        });
+    }
+};
+
+// Endpoint detail
+export const getDetailTempatMakan = async (req, res) => {
+    try {
+        const { place_id } = req.query;
+
+        if (!place_id) {
+            return res.status(400).json({ message: "place_id wajib diisi!" });
+        }
+
+        const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+        const detailUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place_id}&fields=name,formatted_address,geometry,rating,photos,price_level,types&key=${apiKey}`;
+
+        const response = await fetch(detailUrl);
+        const data = await response.json();
+
+        if (data.status !== "OK") {
+            throw new Error(`Google API Error: ${data.status}`);
+        }
+
+        const place = data.result;
+        const priceRange = mapPriceLevelToRupiahRange(place.price_level);
+
+        const detailData = {
+            id: place_id,
+            place_id: place_id,
+            name: place.name,
+            address: place.formatted_address,
+            specialty: "Aneka Makanan",
+            rating: place.rating || 0,
+            priceRange: priceRange,
+            price_level: place.price_level || 0,
+            image: place.photos 
+                ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${place.photos[0].photo_reference}&key=${apiKey}`
+                : "https://via.placeholder.com/800x600?text=No+Image",
+            types: place.types || [],
+            // 🔥 CRITICAL: lat/lng harus ada
+            lat: place.geometry.location.lat,
+            lng: place.geometry.location.lng
+        };
+
+        console.log(`✅ Detail ${place.name}: lat=${detailData.lat}, lng=${detailData.lng}`);
+
+        res.status(200).json({
+            message: "Berhasil mengambil detail",
+            data: detailData
+        });
+
+    } catch (err) {
+        console.error("❌ Kesalahan di getDetailTempatMakan:", err);
+        res.status(500).json({ 
+            message: "Terjadi kesalahan server saat memproses detail", 
+            error: err.message 
+        });
     }
 };

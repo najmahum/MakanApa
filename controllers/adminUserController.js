@@ -41,12 +41,15 @@ export const getAllUsers = async (req, res) => {
         let query = supabase
             .from('users')
             .select('id_user, username, email, role, status, created_at')
-            .eq('role', 'user'); // Hanya ambil user biasa, bukan admin
+            .eq('role', 'user'); // ✅ DIPERBAIKI: Ambil user dengan role 'user', bukan 'admin'
 
         // Jika ada filter status (misal user klik tombol filter)
         if (status && status !== 'all') {
             query = query.eq('status', status);
         }
+
+        // Urutkan berdasarkan created_at terbaru
+        query = query.order('created_at', { ascending: false });
 
         const { data, error } = await query;
 
@@ -65,6 +68,11 @@ export const updateUserStatus = async (req, res) => {
         const { id_user } = req.params;
         const { status } = req.body; // Mengirim { "status": "blocked" } atau "active"
 
+        // Validasi status
+        if (!['active', 'blocked'].includes(status)) {
+            return res.status(400).json({ error: "Status harus 'active' atau 'blocked'" });
+        }
+
         const { data, error } = await supabase
             .from('users')
             .update({ status: status })
@@ -73,7 +81,14 @@ export const updateUserStatus = async (req, res) => {
 
         if (error) throw error;
 
-        res.status(200).json({ message: `User berhasil diubah menjadi ${status}`, data });
+        if (!data || data.length === 0) {
+            return res.status(404).json({ error: "User tidak ditemukan" });
+        }
+
+        res.status(200).json({ 
+            message: `User berhasil diubah menjadi ${status}`, 
+            data: data[0] 
+        });
 
     } catch (error) {
         res.status(500).json({ error: error.message });
