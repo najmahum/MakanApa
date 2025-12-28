@@ -1,0 +1,188 @@
+/* --- CONTAINER UTAMA --- */
+.hasil-container {
+  background-color: #EFEFEF;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Poppins', sans-serif;
+  overflow: hidden;
+}
+
+/* --- HEADER AREA --- */
+.fixed-header {
+  background-color: #FFFAF4;
+  padding: 0 20px 15px 20px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  z-index: 10;
+}
+
+.summary-text {
+  font-size: 14px;
+  color: #000;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.highlight-number {
+  color: #FF4545;
+  font-weight: 800;
+  font-size: 16px;
+}
+
+/* --- SCROLL AREA --- */
+.recipe-list-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.recipe-list-area::-webkit-scrollbar {
+    display: none;
+}
+
+/* --- RECIPE CARD --- */
+.recipe-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  margin-bottom: 20px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  border: 1px solid #FFC09C;
+}
+
+.recipe-card:active {
+  transform: scale(0.98);
+}
+
+/* Gambar Card */
+.card-image {
+  width: 100%;
+  height: 160px;
+  background-color: #ddd;
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* --- KONTEN CARD (FLEXBOX) --- */
+.card-content {
+  padding: 15px;
+  display: flex;
+  justify-content: space-between; /* Memisahkan Teks (Kiri) dan Love (Kanan) */
+  align-items: flex-start;
+}
+
+/* Wrapper Teks (Agar rapi di kiri) */
+.card-text-info {
+  flex: 1; /* Mengambil ruang tersisa */
+  padding-right: 10px; /* Jarak aman biar gak nempel love */
+}
+
+.card-content h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  color: #000;
+  line-height: 1.2;
+}
+
+/* Baris Bawah (Badge & Waktu) */
+.meta-info {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Badge Merah */
+.match-badge {
+  background-color: #FF4545;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.match-badge img {
+  width: 12px;
+  height: 12px;
+  filter: brightness(0) invert(1);
+}
+
+/* Info Waktu */
+.time-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #333;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.time-info img {
+  width: 14px;
+  height: 14px;
+}
+
+/* --- TOMBOL LOVE (SIMPLE) --- */
+.card-btn-love {
+  background: transparent;
+  border: none;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0; /* Biar tombol gak gepeng */
+  padding: 0;
+}
+
+.card-btn-love img {
+  width: 24px; /* Ukuran icon love */
+  height: 24px;
+}
+
+/* Spacer Bawah */
+.spacer-bottom {
+  height: 80px;
+}
+
+/* --- Placeholder Text Jika Gambar Tidak Ada --- */
+.no-image-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: #fffaf4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.no-image-placeholder span {
+  font-size: 14px;
+  font-weight: bold;
+  color: #900B09;
+  line-height: 1.4;
+  
+  /* Membatasi teks maksimal 3 baris biar ga tumpah */
+  display: -webkit-box;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

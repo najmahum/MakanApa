@@ -1,0 +1,223 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+.bahan-container {
+  background-color: #FFFAF4;
+  height: 100vh;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  overflow: hidden;
+  position: relative;
+  padding-bottom: 100px;
+}
+
+/*INPUT BAHAN*/
+.input-card {
+  background: white;
+  border: 1px solid #FFC09C;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  margin-bottom: 10px;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  border: none;
+  border-bottom: 1px solid #CCC;
+  padding: 8px 0;
+  width: 100%;
+  outline: none;
+}
+
+.input-satuan {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 10px;
+  width: 100%;
+}
+
+.wrapper-kecil {
+  display: flex;
+  flex-direction: column;
+}
+
+.wrapper-kecil label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.jumlah {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #333;
+  padding-bottom: 2px;
+  padding-top: 8px;
+  min-width: 90px;
+  justify-content: space-between;
+}
+
+.jumlah button {
+  background: none;
+  border: none;
+  font-weight: bold;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* Untuk Chrome, Safari, Edge, Opera */
+.jumlah input::-webkit-outer-spin-button,
+.jumlah input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Untuk Firefox */
+.jumlah input[type=number] {
+  appearance: textfield;
+}
+
+.jumlah input {
+  width: 60px;
+  text-align: center;
+  border: none;
+  outline: none;
+  font-weight: 600;
+}
+
+.pilih-satuan {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  height: 32px;
+  background: white;
+  min-width: 90px;
+}
+
+.wrapper-tombol {
+  display: flex;
+  flex-direction: column;
+}
+
+.btn-tambah {
+  background-color: #FF4545;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 0 27px;
+  height: 38px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  gap: 5px;
+}
+
+.btn-tambah img {
+  width: 20px;
+  height: 20px;
+}
+
+/*LIST BAHAN*/
+.list-bahan h3 {
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 20px;
+  scrollbar-width: thin; 
+  scrollbar-color: #FFC09C transparent;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.item-bahan {
+  background: white;
+  padding: 12px 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  animation: fadeIn 0.3s ease-in;
+}
+
+.item-bahan .nama {
+  flex: 1;
+  font-weight: 500;
+}
+
+.item-bahan .info {
+  margin-right: 15px;
+  color: #333;
+}
+
+.item-bahan .hapus {
+  background: none;
+  border: none;
+  color: #FF4545;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.empty-state {
+  text-align: center;
+  color: #aaa;
+  margin-top: 20px;
+}
+
+/*CARI RESEP*/
+.footer-tombol {
+  padding: 20px;
+  background-color: #FFFAF4;
+  text-align: center;
+  flex-shrink: 0;
+  padding-bottom: 100px;
+  box-shadow: 0 -10px 20px rgba(255, 250, 244, 0.8);
+}
+
+.tombol-cari {
+  background-color: #FF3838;
+  color: white;
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 25px;
+  font-size: 20px;
+  font-weight: 800;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 15px rgba(255, 56, 56, 0.3);
+  cursor: pointer;
+}
+
+.tombol-cari img {height: 45px;}

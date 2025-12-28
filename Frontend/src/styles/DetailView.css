@@ -1,0 +1,535 @@
+/* src/styles/DetailView.css */
+
+/* ========== MAIN CONTAINER ========== */
+.container-app {
+  width: 100%;
+  min-height: 100vh;
+  background: #faf7f2;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  font-family: Arial, sans-serif;
+  padding-bottom: 80px;
+}
+
+/* ========== BACK BUTTON ========== */
+.btn-back {
+  position: absolute;
+  top: 20px;
+  left: 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.back-circle {
+  width: 36px;
+  height: 36px;
+  background: #ff853a;
+  backdrop-filter: blur(4px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s ease;
+  color: white;
+}
+
+.back-circle:hover {
+  transform: scale(1.1);
+  background: #ff6b35;
+}
+
+/* ========== HEADER IMAGE ========== */
+.header-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+}
+
+.header-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.header-overlay {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+}
+
+.restaurant-title {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  margin: 0;
+}
+
+/* ========== CONTENT ========== */
+.content {
+  flex: 1;
+  padding-bottom: 20px;
+}
+
+/* ========== INFO SECTION ========== */
+.info-section {
+  padding: 18px 20px;
+}
+
+.specialty {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 8px 0;
+  font-weight: 500;
+}
+
+.address {
+  font-size: 13px;
+  color: #999;
+  margin: 0 0 12px 0;
+  line-height: 1.5;
+}
+
+/* ========== META BADGES ========== */
+.meta-info {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.meta-badge {
+  background: #ff6b35;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+}
+
+/* ========== BUTTON TOGGLE MAPS ========== */
+.map-toggle-btn {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #ff6b35;
+  background: white;
+  border-radius: 12px;
+  color: #ff6b35;
+  font-weight: 600;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 16px;
+}
+
+.map-toggle-btn:hover {
+  background: #ff6b35;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
+.map-toggle-btn:active {
+  transform: translateY(0);
+}
+
+/* ========== MAPS SECTION (Expandable) ========== */
+.maps-section {
+  margin-top: 16px;
+  animation: slideDown 0.3s ease-out;
+  overflow: hidden;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+    transform: translateY(0);
+  }
+}
+
+/* MAP CONTAINER */
+.map-container {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.map-iframe {
+  width: 100%;
+  height: 250px;
+  border: 0;
+  display: block;
+}
+
+/* MAPS BUTTONS */
+.maps-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.map-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.map-btn.open-maps {
+  background: #1976d2;
+  color: white;
+}
+
+.map-btn.open-maps:hover {
+  background: #1565c0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+}
+
+.map-btn.directions {
+  background: #4caf50;
+  color: white;
+}
+
+.map-btn.directions:hover {
+  background: #43a047;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.map-btn:active {
+  transform: translateY(0);
+}
+
+/* 🔥 BUTTON KUNING CLICKABLE */
+.location-not-available-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #ff6b35;
+  border: 2px solid #ff6b35;
+  border-radius: 12px;
+  color: white;
+  margin-top: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.location-not-available-btn:hover {
+  background: #ff5722;
+  border-color: #ff5722;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+}
+
+.location-not-available-btn:active {
+  transform: translateY(0);
+}
+
+.location-not-available-btn .btn-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+}
+
+.location-not-available-btn .btn-icon {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: white;
+}
+
+/* ========== INFORMASI TAMBAHAN ========== */
+.additional-info {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.info-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border: 1px solid #e9ecef;
+  transition: all 0.2s ease;
+}
+
+.info-card.clickable {
+  cursor: pointer;
+}
+
+.info-card.clickable:hover {
+  background: #e9ecef;
+  transform: translateX(4px);
+}
+
+.info-icon {
+  width: 40px;
+  height: 40px;
+  background: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff6b35;
+  flex-shrink: 0;
+}
+
+.info-content {
+  flex: 1;
+}
+
+.info-label {
+  margin: 0 0 4px 0;
+  font-size: 12px;
+  color: #999;
+  font-weight: 500;
+}
+
+.info-value {
+  margin: 0;
+  font-size: 14px;
+  color: #333;
+  font-weight: 600;
+}
+
+.info-arrow {
+  color: #999;
+  flex-shrink: 0;
+}
+
+/* ========== DESKRIPSI ========== */
+.description-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #eee;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 12px 0;
+}
+
+.description-text {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #666;
+  margin: 0 0 12px 0;
+}
+
+.description-text:last-child {
+  margin-bottom: 0;
+}
+
+/* ========== FASILITAS ========== */
+.facilities-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #eee;
+  margin-bottom: 20px;
+}
+
+.facilities-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.facility-item {
+  background: #f8f9fa;
+  padding: 12px 8px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: #555;
+  border: 1px solid #e9ecef;
+  transition: all 0.2s ease;
+}
+
+.facility-item:hover {
+  background: #e9ecef;
+  transform: translateY(-2px);
+}
+
+/* ========== LOADING & ERROR STATES ========== */
+.loading-text,
+.error-text,
+.no-data-text {
+  text-align: center;
+  padding: 40px 20px;
+  font-size: 16px;
+  color: #666;
+}
+
+.error-text {
+  color: #dc3545;
+}
+
+.loading-text {
+  color: #ff6b35;
+}
+
+/* ========== MENU SECTION (jika ada) ========== */
+.menu-section {
+  padding: 20px;
+  background: white;
+  margin-top: 16px;
+  border-radius: 12px 12px 0 0;
+}
+
+.menu-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0 0 16px 0;
+  color: #333;
+}
+
+/* GRID MENU */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.menu-card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+}
+
+.menu-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.menu-image-container {
+  width: 100%;
+  height: 90px;
+  overflow: hidden;
+}
+
+.menu-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.menu-name {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 8px;
+  color: #333;
+}
+
+.menu-price {
+  font-size: 12px;
+  color: #ff6b35;
+  font-weight: bold;
+  margin: 0 8px 8px 8px;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .menu-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .facilities-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .restaurant-title {
+    font-size: 20px;
+    bottom: 15px;
+    left: 15px;
+    right: 15px;
+  }
+
+  .info-section {
+    padding: 16px;
+  }
+
+  .maps-buttons {
+    flex-direction: column;
+  }
+
+  .map-btn {
+    width: 100%;
+  }
+
+  .map-iframe {
+    height: 200px;
+  }
+
+  .menu-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .facilities-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  
+  .facility-item {
+    font-size: 12px;
+    padding: 10px 6px;
+  }
+  
+  .section-title {
+    font-size: 16px;
+  }
+  
+  .description-text {
+    font-size: 13px;
+  }
+}

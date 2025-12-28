@@ -1,0 +1,202 @@
+/* Container Utama */
+.detail-container {
+  background-color: #EFEFEF; /* Abu-abu terang */
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: 'League Spartan', sans-serif;
+}
+
+/* Header Wrapper */
+.detail-header {
+  background-color: #FFFBF5; /* Cream Header */
+  padding: 0 20px 10px 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  z-index: 20;
+}
+
+/* Area Scroll Konten */
+.content-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 20px;
+  /* Hide scrollbar */
+  scrollbar-width: none;
+}
+.content-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* --- LOGIC GAMBAR UTAMA (UPDATE) --- */
+.hero-image {
+  width: 100%;
+  height: 250px;
+  background-color: #ddd;
+  position: relative;
+  /* Tambahan biar sudutnya tumpul kalau gambar muncul */
+  /* border-radius: 0 0 20px 20px; (Opsional kalau mau lengkung bawah doang) */
+}
+
+/* Class untuk gambar asli */
+.hero-image img, .img-full {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* KOTAK PENGGANTI (Kalau gambar null/error)*/
+.image-fallback-big {
+  width: 100%;
+  height: 100%;
+  background-color: #FFFAF4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.image-fallback-big span {
+  font-size: 24px;
+  font-weight: 800;
+  color: #900B09;
+  text-align: center;
+  line-height: 1.3;
+  text-transform: capitalize;
+}
+
+/* --- INFO CARD (Waktu & Porsi) --- */
+.info-card {
+  background: white;
+  margin: -30px 20px 20px 20px; /* Margin top minus biar naik ke atas gambar */
+  padding: 15px 20px;
+  border-radius: 12px;
+  border: 1px solid #FFC09C;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  position: relative;
+  z-index: 10;
+  display: flex; /* Biar sejajar kiri kanan */
+  justify-content: space-around; /* Bagi rata */
+}
+
+.info-item {
+  font-size: 14px;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+/* --- CARD KONTEN (Bahan & Langkah) --- */
+.content-card {
+  background: white;
+  margin: 0 20px 20px 20px;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid #FFC09C;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.content-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 15px 0;
+  color: #000;
+  border-bottom: 2px solid #FFFBF5; /* Garis tipis di bawah judul */
+  padding-bottom: 10px;
+}
+
+/* Styling List (Bullet Points) */
+.custom-list, .custom-list-ordered {
+  padding-left: 20px;
+  margin: 0;
+}
+
+.custom-list li, .custom-list-ordered li {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+/* --- STATUS BANNER (Pending/Approved/Rejected) --- */
+.status-banner {
+  margin: 20px 20px 10px 20px;
+  padding: 15px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.status-banner strong {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.status-banner p {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+/* Warna Status */
+.yellow {
+  background-color: #FFF8E1;
+  border: 1px solid #FFECB3;
+  color: #F57F17;
+}
+
+.red {
+  background-color: #FFEBEE;
+  border: 1px solid #FFCDD2;
+  color: #D32F2F;
+}
+
+.green {
+  background-color: #E8F5E9;
+  border: 1px solid #C8E6C9;
+  color: #2E7D32;
+}
+
+/* --- TOMBOL EDIT --- */
+.btn-edit-big {
+  background-color: #333; /* Hitam elegan */
+  color: white;
+  width: calc(100% - 40px); /* Full width dikurangi margin */
+  margin: 0 20px;
+  padding: 15px;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  transition: transform 0.1s;
+}
+
+.btn-edit-big:active {
+  transform: scale(0.98);
+}
+
+/* Spacer Bawah */
+.spacer-navbar {
+  height: 80px;
+}
+
+/* Loading & Error Center */
+.state-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+  color: #888;
+  font-weight: 600;
+  text-align: center;
+}
