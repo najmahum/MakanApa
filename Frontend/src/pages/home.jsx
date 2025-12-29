@@ -11,10 +11,17 @@ const Home = () => {
     const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
-        const role = localStorage.getItem("role");
+        const storedData = localStorage.getItem("userData");
 
-        if (role === "admin") {
-            setIsAdmin(true);
+        if (storedData) {
+            try {
+                const parsedUser = JSON.parse(storedData);
+                if (parsedUser.role && parsedUser.role.toLowerCase() === "admin") {
+                    setIsAdmin(true);
+                }
+            } catch (error) {
+                console.error("Gagal membaca data user:", error);
+            }
         }
     }, []);
 

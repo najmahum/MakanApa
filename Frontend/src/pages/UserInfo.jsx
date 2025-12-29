@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { User, ChevronDown } from 'lucide-react';
+import { User, ChevronDown, } from 'lucide-react'; 
+import { useNavigate } from 'react-router-dom'; 
 import Integrasi from '../config/integrasi';
 import '../styles/UserInfo.css';
 
 const SuperAdminDashboard = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [visitPeriod, setVisitPeriod] = useState('last_week');
   const [showVisitDropdown, setShowVisitDropdown] = useState(false);
@@ -37,13 +39,11 @@ const SuperAdminDashboard = () => {
       setVisitStats(response.data);
     } catch (error) {
       console.error('Error fetching visitor stats:', error);
-      const errorMsg = error.response?.data?.error || 'Gagal mengambil data statistik kunjungan';
-      showNotification(errorMsg, 'error');
       setVisitStats({ total_visits: 0, chart_data: [] });
     } finally {
       setLoading(false);
     }
-  }, [showNotification]);
+  }, []);
 
   const fetchUserStats = useCallback(async () => {
     try {
@@ -51,11 +51,8 @@ const SuperAdminDashboard = () => {
       setUserStats(response.data);
     } catch (error) {
       console.error('Error fetching user stats:', error);
-      const errorMsg = error.response?.data?.error || 'Gagal mengambil data statistik user';
-      showNotification(errorMsg, 'error');
-      setUserStats({ total_users: 0, new_users_today: 0 });
     }
-  }, [showNotification]);
+  }, []);
 
   const fetchUsers = useCallback(async (status = null) => {
     try {
@@ -66,9 +63,7 @@ const SuperAdminDashboard = () => {
       setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);
-      const errorMsg = error.response?.data?.error || 'Gagal mengambil data user';
-      showNotification(errorMsg, 'error');
-      setUsers([]);
+      showNotification('Gagal mengambil data user', 'error');
     } finally {
       setLoading(false);
     }
@@ -82,9 +77,7 @@ const SuperAdminDashboard = () => {
       setRecipes(response.data);
     } catch (error) {
       console.error('Error fetching recipes:', error);
-      const errorMsg = error.response?.data?.error || 'Gagal mengambil data resep';
-      showNotification(errorMsg, 'error');
-      setRecipes([]);
+      showNotification('Gagal mengambil data resep', 'error');
     } finally {
       setLoading(false);
     }
@@ -92,13 +85,14 @@ const SuperAdminDashboard = () => {
 
   const fetchCurrentUser = useCallback(async () => {
     try {
-      const response = await Integrasi.get('/api/admin/me');
+      const response = await Integrasi.get('/api/logs/');
       setCurrentUser(response.data);
     } catch (error) {
       console.error('Error fetching current user:', error);
-      showNotification('Gagal mengambil data user login', 'error');
     }
-  }, [showNotification]);
+  }, []);
+
+  // ===================== Actions =====================
 
   const handleBlockUser = async (userId, currentStatus) => {
     try {
@@ -111,15 +105,18 @@ const SuperAdminDashboard = () => {
 
       const message = response.data.message || `User berhasil ${newStatus === 'blocked' ? 'diblokir' : 'diunblock'}`;
       showNotification(message, newStatus === 'blocked' ? 'error' : 'success');
-
     } catch (error) {
-      console.error('Error updating user status:', error);
-      const errorMsg = error.response?.data?.error || 'Gagal mengubah status user';
-      showNotification(errorMsg, 'error');
+      showNotification('Gagal mengubah status user', 'error');
     }
   };
 
-  const handleApproveRecipe = async (recipeId, newStatus) => {
+  const handleViewDetail = (id_resep) => {
+    navigate(`/resep/${id_resep}`); 
+  };
+
+  const handleStatusChange = async (recipeId, newStatus) => {
+    if(!window.confirm(`Ubah status menjadi ${newStatus}?`)) return;
+
     try {
       const response = await Integrasi.put(`/api/admin/recipes/${recipeId}/status`, { 
         status: newStatus 
@@ -129,23 +126,19 @@ const SuperAdminDashboard = () => {
         recipe.id_resep === recipeId ? { ...recipe, status: newStatus } : recipe
       ));
 
-      const statusText = newStatus === 'approved' ? 'disetujui' : 
-                        newStatus === 'rejected' ? 'ditolak' : 'diubah';
-      const message = response.data.message || `Resep berhasil ${statusText}`;
+      const message = response.data.message || `Status berhasil diubah menjadi ${newStatus}`;
       showNotification(message, newStatus === 'approved' ? 'success' : 'error');
 
     } catch (error) {
       console.error('Error updating recipe status:', error);
-      const errorMsg = error.response?.data?.error || 'Gagal mengubah status resep';
-      showNotification(errorMsg, 'error');
+      showNotification('Gagal mengubah status resep', 'error');
     }
   };
 
   // ===================== useEffect =====================
   useEffect(() => {
     fetchCurrentUser();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchCurrentUser]);
 
   useEffect(() => {
     if (activeTab === 'dashboard') {
@@ -158,81 +151,85 @@ const SuperAdminDashboard = () => {
     }
   }, [activeTab, visitPeriod, filterStatus, filterRecipeStatus, fetchVisitorStats, fetchUserStats, fetchUsers, fetchRecipes]);
 
-  // ===================== Render Functions =====================
-  const maxValue = Math.max(...visitStats.chart_data.map(d => d.visitors), 1);
+  // ===================== RENDERERS =====================
 
-  const renderDashboard = () => (
-    <div className="content-panel">
-      <h2 className="panel-title">Dashboard</h2>
-      <div className="stats-card">
-        <div className="stats-header">
-          <h3>Statistik Kunjungan</h3>
-          <div className="dropdown-container">
-            <button 
-              className="dropdown-button"
-              onClick={() => setShowVisitDropdown(!showVisitDropdown)}
-            >
-              {visitPeriod === 'last_3_days' ? 'Last 3 Days' : 
-               visitPeriod === 'last_week' ? 'Last Week' : 
-               visitPeriod === 'last_month' ? 'Last Month' : 'Last Week'}
-              <ChevronDown size={16} />
-            </button>
-            {showVisitDropdown && (
-              <div className="dropdown-menu">
-                {['last_3_days', 'last_week', 'last_month'].map((p) => (
-                  <button 
-                    key={p}
-                    className={`dropdown-item ${visitPeriod === p ? 'active' : ''}`}
-                    onClick={() => { 
-                      setVisitPeriod(p); 
-                      setShowVisitDropdown(false); 
-                    }}
-                  >
-                    {p === 'last_3_days' ? 'Last 3 Days' : 
-                     p === 'last_week' ? 'Last Week' : 'Last Month'}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+  const renderDashboard = () => {
+    // --- PERBAIKAN: Menambahkan maxValue yang hilang tadi ---
+    const maxValue = Math.max(...visitStats.chart_data.map(d => d.visitors), 1);
 
-        <div className="stats-summary">
-          <p>Total Kunjungan: <strong>{visitStats.total_visits}</strong></p>
-          <p className="period-info">Period: {visitStats.period || visitPeriod}</p>
-        </div>
+    return (
+      <div className="content-panel">
+         <h2 className="panel-title">Dashboard</h2>
+         <div className="stats-card">
+           <div className="stats-header">
+             <h3>Statistik Kunjungan</h3>
+             <div className="dropdown-container">
+               <button 
+                 className="dropdown-button"
+                 onClick={() => setShowVisitDropdown(!showVisitDropdown)}
+               >
+                 {visitPeriod === 'last_3_days' ? 'Last 3 Days' : 
+                  visitPeriod === 'last_week' ? 'Last Week' : 
+                  visitPeriod === 'last_month' ? 'Last Month' : 'Last Week'}
+                 <ChevronDown size={16} />
+               </button>
+               {showVisitDropdown && (
+                 <div className="dropdown-menu">
+                   {['last_3_days', 'last_week', 'last_month'].map((p) => (
+                     <button 
+                       key={p}
+                       className={`dropdown-item ${visitPeriod === p ? 'active' : ''}`}
+                       onClick={() => { 
+                         setVisitPeriod(p); 
+                         setShowVisitDropdown(false); 
+                       }}
+                     >
+                       {p === 'last_3_days' ? 'Last 3 Days' : 
+                        p === 'last_week' ? 'Last Week' : 'Last Month'}
+                     </button>
+                   ))}
+                 </div>
+               )}
+             </div>
+           </div>
 
-        <div className="chart-container">
-          {loading ? (
-            <div className="loading-spinner">
-              <div className="spinner"></div>
-              <p>Loading data...</p>
-            </div>
-          ) : visitStats.chart_data.length > 0 ? (
-            visitStats.chart_data.map((data, index) => (
-              <div key={index} className="bar-wrapper">
-                <div 
-                  className="bar" 
-                  style={{ height: `${(data.visitors / maxValue) * 100}%` }}
-                  title={`${data.visitors} visitors`}
-                >
-                  <span className="bar-value">{data.visitors}</span>
-                </div>
-                <span className="bar-label">
-                  {new Date(data.date).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit' })}
-                </span>
-              </div>
-            ))
-          ) : (
-            <div className="empty-state">
-              <p>📊 Tidak ada data kunjungan</p>
-            </div>
-          )}
-        </div>
+           <div className="stats-summary">
+             <p>Total Kunjungan: <strong>{visitStats.total_visits}</strong></p>
+             <p className="period-info">Period: {visitStats.period || visitPeriod}</p>
+           </div>
+
+           <div className="chart-container">
+             {loading ? (
+               <div className="loading-spinner">
+                 <div className="spinner"></div>
+                 <p>Loading data...</p>
+               </div>
+             ) : visitStats.chart_data.length > 0 ? (
+               visitStats.chart_data.map((data, index) => (
+                 <div key={index} className="bar-wrapper">
+                   <div 
+                     className="bar" 
+                     style={{ height: `${(data.visitors / maxValue) * 100}%` }}
+                     title={`${data.visitors} visitors`}
+                   >
+                     <span className="bar-value">{data.visitors}</span>
+                   </div>
+                   <span className="bar-label">
+                     {new Date(data.date).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit' })}
+                   </span>
+                 </div>
+               ))
+             ) : (
+               <div className="empty-state">
+                 <p>📊 Tidak ada data kunjungan</p>
+               </div>
+             )}
+           </div>
+         </div>
       </div>
-    </div>
-  );
-
+    );
+  };
+  
   const renderUserInfo = () => (
     <div className="content-panel">
       <h2 className="panel-title">User Information</h2>
@@ -353,29 +350,17 @@ const SuperAdminDashboard = () => {
               onClick={() => setShowRecipeFilterDropdown(!showRecipeFilterDropdown)}
             >
               Filter: {filterRecipeStatus === 'all' ? 'All' : 
-                      filterRecipeStatus === 'waiting' ? 'Pending' : 
-                      filterRecipeStatus === 'approved' ? 'Approved' : 'Rejected'}
+                       filterRecipeStatus === 'waiting' ? 'Pending' : 
+                       filterRecipeStatus === 'approved' ? 'Approved' : 'Rejected'}
               <ChevronDown size={16} />
             </button>
 
             {showRecipeFilterDropdown && (
               <div className="dropdown-menu">
-                {[
-                  { value: 'all', label: 'All' },
-                  { value: 'waiting', label: 'Pending' },
-                  { value: 'approved', label: 'Approved' },
-                  { value: 'rejected', label: 'Rejected' }
-                ].map((option) => (
-                  <button 
-                    key={option.value}
-                    className={`dropdown-item ${filterRecipeStatus === option.value ? 'active' : ''}`}
-                    onClick={() => { 
-                      setFilterRecipeStatus(option.value); 
-                      setShowRecipeFilterDropdown(false); 
-                    }}
-                  >
-                    {option.label}
-                  </button>
+                {['all', 'waiting', 'approved', 'rejected'].map((val) => (
+                   <button key={val} className="dropdown-item" onClick={() => { setFilterRecipeStatus(val); setShowRecipeFilterDropdown(false); }}>
+                     {val}
+                   </button>
                 ))}
               </div>
             )}
@@ -392,59 +377,68 @@ const SuperAdminDashboard = () => {
 
           <div className="table-body">
             {loading ? (
-              <div className="loading-row">
-                <div className="loading-spinner">
-                  <div className="spinner"></div>
-                  <p>Memuat data resep...</p>
-                </div>
-              </div>
+              <div className="loading-row"><p>Memuat data...</p></div>
             ) : recipes.length > 0 ? (
-              recipes.map((recipe, index) => (
-                <div 
-                  key={recipe.id_resep} 
-                  className={`table-row recipe-row ${
-                    recipe.status === 'rejected' ? 'rejected-row' : 
-                    recipe.status === 'approved' ? 'approved-row' : ''
-                  }`}
-                >
-                  <div className="table-col col-number">{index + 1}</div>
-                  <div className="table-col col-recipe-username" title={recipe.pembuat}>
-                    {recipe.pembuat}
-                  </div>
-                  <div className="table-col col-recipe-title" title={recipe.nama_resep}>
-                    {recipe.nama_resep}
-                  </div>
-                  <div className="table-col col-recipe-status">
-                    {recipe.status === 'waiting' ? (
-                      <div className="recipe-actions">
-                        <button 
-                          className="recipe-action-btn approve-btn"
-                          onClick={() => handleApproveRecipe(recipe.id_resep, 'approved')}
-                          disabled={loading}
+              recipes.map((recipe, index) => {
+                
+                const statusLower = recipe.status ? recipe.status.toLowerCase() : '';
+                const isPending = statusLower === 'pending' || statusLower === 'waiting';
+
+                return (
+                  <div 
+                    key={recipe.id_resep} 
+                    className={`table-row recipe-row ${
+                        statusLower === 'rejected' ? 'rejected-row' : 
+                        statusLower === 'approved' ? 'approved-row' : ''
+                    }`}
+                  >
+                    <div className="table-col col-number">{index + 1}</div>
+                    <div className="table-col col-recipe-username">
+                      {recipe.pembuat || recipe.users?.username}
+                    </div>
+                    
+                    <div 
+                      className="table-col col-recipe-title clickable-title" 
+                      title="Klik untuk lihat detail halaman"
+                      onClick={() => handleViewDetail(recipe.id_resep)}
+                      style={{ cursor: 'pointer', textDecoration: 'underline', color: '#ff6b35' }}
+                    >
+                      {recipe.nama_resep}
+                    </div>
+
+                    <div className="table-col col-recipe-status">
+                      {isPending ? (
+                        <select 
+                          className="status-dropdown"
+                          defaultValue=""
+                          onChange={(e) => handleStatusChange(recipe.id_resep, e.target.value)}
+                          style={{
+                            padding: '6px 12px',
+                            borderRadius: '20px',
+                            border: '1px solid #f57c00',
+                            backgroundColor: '#fff3e0',
+                            color: '#f57c00',
+                            fontWeight: '600',
+                            fontSize: '13px',
+                            cursor: 'pointer',
+                            outline: 'none'
+                          }}
                         >
-                          Approve
-                        </button>
-                        <button 
-                          className="recipe-action-btn reject-btn"
-                          onClick={() => handleApproveRecipe(recipe.id_resep, 'rejected')}
-                          disabled={loading}
-                        >
-                          Rejected
-                        </button>
-                      </div>
-                    ) : (
-                      <span className={`recipe-status-badge ${recipe.status}`}>
-                        {recipe.status === 'approved' ? 'Approved' : 
-                         recipe.status === 'rejected' ? 'Rejected' : 'Pending'}
-                      </span>
-                    )}
+                          <option value="" disabled>Pending ▾</option>
+                          <option value="approved">✓ Setujui</option>
+                          <option value="rejected">✕ Tolak</option>
+                        </select>
+                      ) : (
+                        <span className={`recipe-status-badge ${statusLower}`}>
+                            {recipe.status}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             ) : (
-              <div className="empty-state">
-                <p>📝 Tidak ada data resep</p>
-              </div>
+              <div className="empty-state"><p>Tidak ada data resep</p></div>
             )}
           </div>
         </div>
@@ -454,70 +448,61 @@ const SuperAdminDashboard = () => {
 
   const renderProfile = () => (
     <div className="content-panel">
-      <h2 className="panel-title">Profile</h2>
-      <div className="profile-container">
-        <div className="profile-avatar">
-          <User size={80} strokeWidth={1.5} />
-        </div>
-        <div className="profile-info">
-          <div className="info-row">
-            <span className="info-label">Username</span>
-            <span className="info-value">{currentUser.username || 'SuperAdmin'}</span>
+       <h2 className="panel-title">Profile</h2>
+       <div className="profile-container">
+          <div className="profile-avatar">
+            <User size={80} strokeWidth={1.5} />
           </div>
-          <div className="info-row">
-            <span className="info-label">Nama</span>
-            <span className="info-value">{currentUser.name || 'Admin'}</span>
+          <div className="profile-info">
+            <div className="info-row">
+              <span className="info-label">Username</span>
+              <span className="info-value">{currentUser.username || 'SuperAdmin'}</span>
+            </div>
+            <div className="info-row">
+              <span className="info-label">Nama</span>
+              <span className="info-value">{currentUser.name || 'Admin'}</span>
+            </div>
+            <div className="info-row">
+              <span className="info-label">Email</span>
+              <span className="info-value">{currentUser.email || 'admin@makanyuk.com'}</span>
+            </div>
+            <div className="info-row">
+              <span className="info-label">Password</span>
+              <span className="info-value">••••••••••</span>
+            </div>
           </div>
-          <div className="info-row">
-            <span className="info-label">Email</span>
-            <span className="info-value">{currentUser.email || 'admin@makanyuk.com'}</span>
-          </div>
-          <div className="info-row">
-            <span className="info-label">Password</span>
-            <span className="info-value">••••••••••</span>
-          </div>
-        </div>
-        <button className="logout-btn">Logout</button>
-      </div>
+          <button className="logout-btn">Logout</button>
+       </div>
     </div>
   );
 
-  // ===================== RETURN =====================
   return (
     <div className="dashboard-container">
       {notification.show && (
-        <div className={`notification ${notification.type}`}>
-          {notification.message}
-        </div>
+        <div className={`notification ${notification.type}`}>{notification.message}</div>
       )}
 
-      {/* PERBAIKAN DI SINI: Ganti 'top-nav' jadi 'admin-top-nav' */}
-      <nav className="admin-top-nav">
-        
-        {/* Ganti 'nav-item' jadi 'admin-nav-item' di semua tombol */}
+      <nav className="top-nav">
         <button 
-          className={activeTab === 'dashboard' ? 'admin-nav-item active' : 'admin-nav-item'} 
+          className={activeTab === 'dashboard' ? 'nav-item active' : 'nav-item'} 
           onClick={() => setActiveTab('dashboard')}
         >
           Dashboard
         </button>
-        
         <button 
-          className={activeTab === 'users' ? 'admin-nav-item active' : 'admin-nav-item'} 
+          className={activeTab === 'users' ? 'nav-item active' : 'nav-item'} 
           onClick={() => setActiveTab('users')}
         >
           User Information
         </button>
-        
         <button 
-          className={activeTab === 'management' ? 'admin-nav-item active' : 'admin-nav-item'} 
+          className={activeTab === 'management' ? 'nav-item active' : 'nav-item'} 
           onClick={() => setActiveTab('management')}
         >
           Management Resep
         </button>
-        
         <button 
-          className={activeTab === 'profile' ? 'admin-nav-item active' : 'admin-nav-item'} 
+          className={activeTab === 'profile' ? 'nav-item active' : 'nav-item'} 
           onClick={() => setActiveTab('profile')}
         >
           Profile

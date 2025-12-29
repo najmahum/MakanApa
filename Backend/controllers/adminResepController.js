@@ -15,7 +15,7 @@ export const getAllResepAdmin = async (req, res) => {
                 id_resep, 
                 nama_resep, 
                 status, 
-                created_at,
+                tanggal_dibuat,
                 users (username) 
             `);
             // Syntax users(username) artinya ambil kolom username dari tabel users yg berelasi
@@ -25,7 +25,7 @@ export const getAllResepAdmin = async (req, res) => {
         }
 
         // Urutkan dari yang terbaru (biasanya admin mau liat yg baru masuk)
-        query = query.order('created_at', { ascending: false });
+        query = query.order('tanggal_dibuat', { ascending: false });
 
         const { data, error } = await query;
 
